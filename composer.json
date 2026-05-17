@@ -1,16 +1,17 @@
 {
-  "name": "elfarmawy/laravel-api-wrapper-template",
-  "description": "Laravel package for template API integration",
-  "type": "project",
+  "name": "elfarmawy/laravel-fawaterk",
+  "description": "Production-ready Laravel SDK for the Fawaterak payment gateway",
+  "type": "library",
   "license": "MIT",
   "version": "1.0.0",
   "keywords": [
     "elfarmawy",
     "laravel",
-    "template",
-    "template-API",
-    "laravel-api-wrapper-template",
-    "api-wrapper-template"
+    "fawaterak",
+    "payment",
+    "payment-gateway",
+    "sdk",
+    "api-wrapper"
   ],
   "authors": [
     {
@@ -20,44 +21,53 @@
       "role": "Developer"
     }
   ],
-  "homepage": "https://github.com/tarekhesham/laravel-api-wrapper-template",
+  "homepage": "https://github.com/elfarmawy/laravel-fawaterk",
   "require": {
-    "php": "^8.1",
-    "illuminate/support": "^10.0|^11.0|^12.0",
-    "illuminate/http": "^10.0|^11.0|^12.0"
+    "php": "^8.2",
+    "illuminate/support": "^10.0|^11.0|^12.0|^13.0",
+    "illuminate/http": "^10.0|^11.0|^12.0|^13.0"
   },
   "require-dev": {
     "orchestra/testbench": "^8.0|^9.0|^10.0",
-    "phpunit/phpunit": "^10.0|^11.0"
+    "pestphp/pest": "^2.0|^3.0",
+    "pestphp/pest-plugin-laravel": "^2.0|^3.0",
+    "nunomaduro/larastan": "^2.0|^3.0",
+    "phpstan/phpstan": "^1.10|^2.0"
   },
   "autoload": {
     "psr-4": {
-      "ElFarmawy\\Template\\": "src/"
+      "ElFarmawy\\Fawaterk\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "ElFarmawy\\Template\\Tests\\": "tests/"
+      "ElFarmawy\\Fawaterk\\Tests\\": "tests/"
     }
   },
   "extra": {
     "laravel": {
       "providers": [
-        "ElFarmawy\\Template\\Providers\\TemplateServiceProvider"
+        "ElFarmawy\\Fawaterk\\Providers\\FawaterkServiceProvider"
       ],
       "aliases": {
-        "API": "ElFarmawy\\Template\\Facades\\API"
+        "Fawaterk": "ElFarmawy\\Fawaterk\\Facades\\Fawaterk"
       }
     }
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
   "scripts": {
-    "test": "vendor/bin/phpunit"
+    "test": "vendor/bin/pest",
+    "analyse": "vendor/bin/phpstan analyse"
   },
   "support": {
     "email": "tarekelfarmawy@outlook.com",
-    "issues": "https://github.com/tarekhesham/laravel-api-wrapper-template/issues",
-    "source": "https://github.com/tarekhesham/laravel-api-wrapper-template"
+    "issues": "https://github.com/elfarmawy/laravel-fawaterk/issues",
+    "source": "https://github.com/elfarmawy/laravel-fawaterk"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
   }
 }
