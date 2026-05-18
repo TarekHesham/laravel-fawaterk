@@ -71,4 +71,9 @@ final class CreateInvoiceRequest
 
         return $data;
     }
+
+    public static function builder(): CreateInvoiceBuilder
+    {
+        return new CreateInvoiceBuilder();
+    }
 }
