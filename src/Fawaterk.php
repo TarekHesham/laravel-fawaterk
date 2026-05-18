@@ -45,4 +45,9 @@ class Fawaterk
     // Example:
     //   public function invoices(): \ElFarmawy\Fawaterk\Endpoints\InvoicesEndpoint { … }
     // -------------------------------------------------------------------------
+
+    public function invoices(): \ElFarmawy\Fawaterk\Endpoints\InvoiceEndpoint
+    {
+        return new \ElFarmawy\Fawaterk\Endpoints\InvoiceEndpoint($this->client);
+    }
 }

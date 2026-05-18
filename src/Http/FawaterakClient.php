@@ -156,7 +156,13 @@ class FawaterakClient
 
         // Normalise HTTP errors into typed exceptions.
         if ($response->failed()) {
-            $message = (string) ($body['message'] ?? $response->reason() ?? 'Unknown error');
+           $apiMessage = $body['message'] ?? null;
+            
+            if (is_array($apiMessage)) {
+                $message = json_encode($apiMessage, JSON_UNESCAPED_UNICODE);
+            } else {
+                $message = (string) ($apiMessage ?? $response->reason() ?? 'Unknown error');
+            }
 
             match (true) {
                 $status === 401 => throw new AuthenticationException(
