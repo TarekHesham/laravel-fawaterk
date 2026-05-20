@@ -24,13 +24,23 @@ final class CustomerData
         public readonly ?string $address = null,
         public readonly ?string $customerUniqueId = null,
     ) {
+        $pattern = '/^[a-zA-Z0-9@\-_.]+$/';
+
         if (trim($this->firstName) === '') {
-            throw new InvalidArgumentException('Customer first name cannot be empty.');
+            throw new \InvalidArgumentException('Customer first name cannot be empty.');
         }
+        if (!preg_match($pattern, $this->firstName)) {
+            \Illuminate\Support\Facades\Log::warning('Customer first name contains characters outside of expected range.', ['firstName' => $this->firstName]);
+        }
+
         if (trim($this->lastName) === '') {
-            throw new InvalidArgumentException('Customer last name cannot be empty.');
+            throw new \InvalidArgumentException('Customer last name cannot be empty.');
+        }
+        if (!preg_match($pattern, $this->lastName)) {
+            \Illuminate\Support\Facades\Log::warning('Customer last name contains characters outside of expected range.', ['lastName' => $this->lastName]);
         }
     }
+
 
     /**
      * @param array<string, mixed> $data
