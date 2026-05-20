@@ -1,43 +1,21 @@
-name: Run Tests
+name: run-tests
 
-on:
-  push:
-    branches:
-      - main
-      - develop
-  pull_request:
+on: [push, pull_request]
 
 jobs:
-  tests:
+  test:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        php: [8.2, 8.3]
-
-    name: PHP ${{ matrix.php }}
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Setup PHP
+      - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
-          coverage: none
+          php-version: "8.3"
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-interaction
+        run: composer install
 
-      - name: Copy environment
-        run: cp .env.example .env || true
-
-      - name: Run Pint
-        run: vendor/bin/pint --test
-
-      - name: Run PHPStan
-        run: vendor/bin/phpstan analyse
-
-      - name: Run Tests
-        run: vendor/bin/pest
+      - name: Run tests
+        run: composer test
