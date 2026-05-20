@@ -1,0 +1,28 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ElFarmawy\Fawaterk\Data\Gateway;
+
+use ElFarmawy\Fawaterk\Http\ApiResponse;
+
+final class InitPayRedirectResponse
+{
+    public function __construct(
+        public readonly int $invoiceId,
+        public readonly string $invoiceKey,
+        public readonly string $redirectTo,
+    ) {
+    }
+
+    public static function fromApiResponse(ApiResponse $response): self
+    {
+        $data = $response->data();
+
+        return new self(
+            invoiceId: (int) $data['invoice_id'],
+            invoiceKey: (string) $data['invoice_key'],
+            redirectTo: (string) $data['payment_data']['redirectTo'],
+        );
+    }
+}

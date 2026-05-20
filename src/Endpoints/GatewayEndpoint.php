@@ -4,8 +4,14 @@ declare(strict_types=1);
 
 namespace ElFarmawy\Fawaterk\Endpoints;
 
+use ElFarmawy\Fawaterk\Data\Gateway\InitPayFawryResponse;
+use ElFarmawy\Fawaterk\Data\Gateway\InitPayMeezaResponse;
+use ElFarmawy\Fawaterk\Data\Gateway\InitPayRedirectResponse;
+use ElFarmawy\Fawaterk\Data\Gateway\InitPayRequest;
 use ElFarmawy\Fawaterk\Data\PaymentMethodResponse;
 use ElFarmawy\Fawaterk\Http\BaseEndpoint;
+use ElFarmawy\Fawaterk\Http\ApiResponse;
+use ElFarmawy\Fawaterk\Exceptions\ApiException;
 
 class GatewayEndpoint extends BaseEndpoint
 {
@@ -29,5 +35,44 @@ class GatewayEndpoint extends BaseEndpoint
         }
 
         return array_map(fn (array $data) => PaymentMethodResponse::fromArray($data), $paymentMethodsData);
+    }
+
+    /**
+     * Initiate a payment and get the appropriate response based on the payment method.
+     */
+    public function invoiceInitPay(InitPayRequest $request): InitPayRedirectResponse|InitPayFawryResponse|InitPayMeezaResponse
+    {
+        $response = $this->client->post('/invoiceInitPay', $request->toArray());
+
+        return $this->resolveInitPayResponse($response);
+    }
+
+    /**
+     * Resolve the InitPay response into the correct DTO.
+     */
+    private function resolveInitPayResponse(ApiResponse $response): InitPayRedirectResponse|InitPayFawryResponse|InitPayMeezaResponse
+    {
+        $paymentData = $response->get('payment_data');
+
+        if (isset($paymentData['redirectTo'])) {
+            return InitPayRedirectResponse::fromApiResponse($response);
+        }
+
+        if (isset($paymentData['fawryCode'])) {
+            return InitPayFawryResponse::fromApiResponse($response);
+        }
+
+        if (isset($paymentData['meezaQrCode'])) {
+            return InitPayMeezaResponse::fromApiResponse($response);
+        }
+
+        // If none of the specific types match, it means an unknown payment method
+        // or a different response structure. In a real scenario, this might
+        // throw a custom exception or return a generic error response.
+        // For now, we'll throw a generic API exception.
+        throw new ApiException(
+            message: 'Unknown InitPay response type',
+            context: $response->raw(),
+        );
     }
 }
