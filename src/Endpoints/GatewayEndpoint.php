@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace ElFarmawy\Fawaterk\Endpoints;
 
+use ElFarmawy\Fawaterk\Data\Gateway\CreateCardTokenizationRequest;
+use ElFarmawy\Fawaterk\Data\Gateway\CreateTokenScreenRequest;
+use ElFarmawy\Fawaterk\Data\Gateway\DeleteTokenRequest;
 use ElFarmawy\Fawaterk\Data\Gateway\InitPayFawryResponse;
 use ElFarmawy\Fawaterk\Data\Gateway\InitPayMeezaResponse;
 use ElFarmawy\Fawaterk\Data\Gateway\InitPayRedirectResponse;
 use ElFarmawy\Fawaterk\Data\Gateway\InitPayRequest;
+use ElFarmawy\Fawaterk\Data\Gateway\TokenizationPayRequest;
 use ElFarmawy\Fawaterk\Data\PaymentMethodResponse;
 use ElFarmawy\Fawaterk\Http\BaseEndpoint;
 use ElFarmawy\Fawaterk\Http\ApiResponse;
@@ -45,6 +49,34 @@ class GatewayEndpoint extends BaseEndpoint
         $response = $this->client->post('/invoiceInitPay', $request->toArray());
 
         return $this->resolveInitPayResponse($response);
+    }
+
+    public function createCardTokenScreen(CreateTokenScreenRequest $request): string
+    {
+        $response = $this->client->post('/createCardTokenScreen', $request->toArray());
+
+        return (string) $response->get('redirectUrl');
+    }
+
+    public function createCardTokenization(CreateCardTokenizationRequest $request): array
+    {
+        $response = $this->client->post('/createCardTokenization', $request->toArray());
+
+        return $response->data();
+    }
+
+    public function createTokenizationPayRequest(TokenizationPayRequest $request): array
+    {
+        $response = $this->client->post('/createTokenizationPayRequest', $request->toArray());
+
+        return $response->data();
+    }
+
+    public function deleteCustomerToken(DeleteTokenRequest $request): bool
+    {
+        $response = $this->client->post('/deleteCustomerToken', $request->toArray());
+
+        return $response->get('status') === 'success';
     }
 
     /**
