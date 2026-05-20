@@ -8,6 +8,14 @@ use InvalidArgumentException;
 
 final class CustomerData
 {
+    /**
+     * @param string $firstName Alphanumeric, @, -, _, . (Mandatory)
+     * @param string $lastName Alphanumeric, @, -, _, . (Mandatory)
+     * @param string|null $email (Optional)
+     * @param string|null $phone (Optional)
+     * @param string|null $address Alphanumeric, @, -, _, ., ,, : (Optional)
+     * @param string|null $customerUniqueId (Mandatory if tokenization is used)
+     */
     public function __construct(
         public readonly string $firstName,
         public readonly string $lastName,

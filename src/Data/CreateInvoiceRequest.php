@@ -11,22 +11,24 @@ final class CreateInvoiceRequest
 {
     /**
      * @param array<CartItemData> $cartItems
+     * @param array<string, mixed>|null $payLoad Custom fields to persist between send/receive steps.
+     * @param string|null $dueDate Format: Y-m-d.
      * @param array<string, mixed>|null $payLoad
      */
     public function __construct(
-        public readonly float $cartTotal,
-        public readonly Currency $currency,
-        public readonly CustomerData $customer,
-        public readonly array $cartItems,
-        public readonly ?string $shipping = null,
-        public readonly ?Frequency $frequency = null,
-        public readonly ?bool $sendSMS = null,
-        public readonly ?bool $sendEmail = null,
-        public readonly ?DiscountData $discountData = null,
-        public readonly ?TaxData $taxData = null,
-        public readonly ?array $payLoad = null,
-        public readonly ?string $dueDate = null,
-        public readonly ?RedirectionUrlsData $redirectionUrls = null,
+        public readonly float $cartTotal, // Mandatory
+        public readonly Currency $currency, // Mandatory: 'USD', 'EGP', 'SR', 'AED', 'KWD', 'QAR', 'BHD'
+        public readonly CustomerData $customer, // Mandatory
+        public readonly array $cartItems, // Mandatory: Array of CartItemData
+        public readonly ?string $shipping = null, // Optional: Decimal
+        public readonly ?Frequency $frequency = null, // Optional: Default 'once'
+        public readonly ?bool $sendSMS = null, // Optional
+        public readonly ?bool $sendEmail = null, // Optional
+        public readonly ?DiscountData $discountData = null, // Optional
+        public readonly ?TaxData $taxData = null, // Optional
+        public readonly ?array $payLoad = null, // Optional
+        public readonly ?string $dueDate = null, // Optional: Y-m-d
+        public readonly ?RedirectionUrlsData $redirectionUrls = null, // Optional
     ) {}
 
     /**
