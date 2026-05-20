@@ -1,6 +1,7 @@
 # Laravel Fawaterk
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/ElFarmawy/laravel-fawaterk.svg?style=flat-square)](https://packagist.org/packages/ElFarmawy/laravel-fawaterk)
+[![Total Downloads](https://img.shields.io/packagist/dt/ElFarmawy/laravel-fawaterk.svg?style=flat-square)](https://packagist.org/packages/ElFarmawy/laravel-fawaterk)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/TarekHesham/laravel-fawaterk/run-tests.yml?branch=main)](https://github.com/TarekHesham/laravel-fawaterk/actions?query=workflow%3Arun-tests+branch%3Amain)
 
 A lightweight Laravel API wrapper for the Fawaterk payment gateway.
