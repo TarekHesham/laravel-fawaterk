@@ -34,7 +34,7 @@ it('can verify a paid invoice from webhook', function () {
         ->with($invoiceId)
         ->andReturn($mockInvoiceResponse);
 
-    $invoiceResponse = $this->invoiceEndpoint->verifyInvoiceFromWebhook($invoiceId);
+    $invoiceResponse = $this->invoiceEndpoint->verifyPaidInvoice($invoiceId);
 
     expect($invoiceResponse)->toBeInstanceOf(InvoiceResponse::class)
         ->and($invoiceResponse->data)->not->toBeNull()
@@ -53,7 +53,7 @@ it('throws RequestException if invoice is not found', function () {
         ->with($invoiceId)
         ->andReturn($mockInvoiceResponse);
 
-    $this->invoiceEndpoint->verifyInvoiceFromWebhook($invoiceId);
+    $this->invoiceEndpoint->verifyPaidInvoice($invoiceId);
 })->throws(RequestException::class, "Invoice with ID 456 not found or no data returned.");
 
 it('throws RequestException if invoice status is not paid', function () {
@@ -75,7 +75,7 @@ it('throws RequestException if invoice status is not paid', function () {
         ->with($invoiceId)
         ->andReturn($mockInvoiceResponse);
 
-    $this->invoiceEndpoint->verifyInvoiceFromWebhook($invoiceId);
+    $this->invoiceEndpoint->verifyPaidInvoice($invoiceId);
 })->throws(RequestException::class, "Invoice with ID 789 has a status of 'pending', expected 'paid'.");
 
 it('throws RequestException on API exception during data retrieval', function () {
@@ -84,6 +84,5 @@ it('throws RequestException on API exception during data retrieval', function ()
         ->with($invoiceId)
         ->andThrow(new ApiException('API Error', 0, [])); // Pass array for context
 
-    $this->invoiceEndpoint->verifyInvoiceFromWebhook($invoiceId);
+    $this->invoiceEndpoint->verifyPaidInvoice($invoiceId);
 })->throws(RequestException::class, "Failed to retrieve invoice data for ID 101: API Error");
-

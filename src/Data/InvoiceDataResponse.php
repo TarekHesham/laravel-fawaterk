@@ -69,7 +69,7 @@ final class InvoiceDataResponse
             invoiceId: $invoiceId,
             invoiceKey: $invoiceKey,
             invoiceUrl: $invoiceUrl,
-            invoiceStatus: isset($data['invoice_status']) ? (string) $data['invoice_status'] : null,
+            invoiceStatus: isset($data['invoice_status']) ? (string) $data['invoice_status'] : (isset($data['status_text']) ? (string) $data['status_text'] : null),
             paymentMethod: isset($data['payment_method']) ? (string) $data['payment_method'] : null,
             referenceNumber: isset($data['referenceNumber']) ? (string) $data['referenceNumber'] : null,
             cartTotal: $cartTotal,

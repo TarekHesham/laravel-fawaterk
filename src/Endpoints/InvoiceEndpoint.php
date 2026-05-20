@@ -32,7 +32,7 @@ class InvoiceEndpoint extends BaseEndpoint
         return InvoiceResponse::fromApiResponse($response);
     }
 
-    public function verifyInvoiceFromWebhook(int $invoiceId): InvoiceResponse
+    public function verifyPaidInvoice(int $invoiceId): InvoiceResponse
     {
         try {
             $invoiceResponse = $this->getInvoiceData($invoiceId);
@@ -41,9 +41,12 @@ class InvoiceEndpoint extends BaseEndpoint
                 throw new RequestException("Invoice with ID {$invoiceId} not found or no data returned.");
             }
 
-            // TODO: Clarify what "status mismatch" means for throwing RequestException.
-            // For now, it just ensures the invoice data exists.
-            if ($invoiceResponse->data->invoiceStatus !== 'paid') {
+            if ($invoiceResponse->data->invoiceStatus !== 'paid' && $invoiceResponse->data->paid !== true) {
+                \Illuminate\Support\Facades\Log::debug('Invoice verification failed status check.', [
+                    'invoiceId' => $invoiceId,
+                    'raw' => $invoiceResponse->raw,
+                ]);
+
                 throw new RequestException("Invoice with ID {$invoiceId} has a status of '{$invoiceResponse->data->invoiceStatus}', expected 'paid'.");
             }
 

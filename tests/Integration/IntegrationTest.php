@@ -107,4 +107,15 @@ class IntegrationTest extends TestCase
 
         $this->assertEquals($created->data->invoiceId, $retrieved->data->invoiceId);
     }
+
+    public function testVerifyInvoiceFromWebhook()
+    {
+        $endpoint = new \ElFarmawy\Fawaterk\Endpoints\InvoiceEndpoint($this->fawaterk->client());
+
+        $invoiceId = 1099266;
+
+        $response = $endpoint->verifyPaidInvoice($invoiceId);
+
+        $this->assertTrue($response->data->invoiceStatus === 'paid' || $response->data->paid === true);
+    }
 }
