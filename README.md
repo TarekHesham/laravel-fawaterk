@@ -1,107 +1,124 @@
-# Laravel API Wrapper Template
+# Laravel Fawaterk
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/ElFarmawy/laravel-api-wrapper-template.svg?style=flat-square)](https://packagist.org/packages/ElFarmawy/laravel-api-wrapper-template)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/TarekHesham/laravel-api-wrapper-template/run-tests.yml?branch=main)](https://github.com/TarekHesham/laravel-api-wrapper-template/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/ElFarmawy/laravel-laravel-fawaterk.svg?style=flat-square)](https://packagist.org/packages/ElFarmawy/laravel-laravel-fawaterk)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/TarekHesham/laravel-laravel-fawaterk/run-tests.yml?branch=main)](https://github.com/TarekHesham/laravel-laravel-fawaterk/actions?query=workflow%3Arun-tests+branch%3Amain)
 
-A **starter template** for creating Laravel API Wrapper packages — providing a clean structure, config system, and testing setup.
-This package contains **no prebuilt request methods**, giving you full freedom to implement your own integration logic. **It’s not meant to be installed directly in production projects**.
+A lightweight Laravel API wrapper for the Fawaterk payment gateway.
 
-## Quick Start
+## Package Overview
 
-### 1. Clone the template
+This package simplifies Fawaterk API integration in Laravel applications by providing clean, minimal abstractions. It is designed to be a thin wrapper around the official Fawaterk API, ensuring developers can interact with the payment gateway using structured data objects while maintaining full control.
 
-```bash
-git clone https://github.com/TarekHesham/laravel-api-wrapper-template.git your-api-wrapper
-cd your-api-wrapper
-```
+* **Supported Features:** Invoice creation, status retrieval, payment initialization (redirect, Fawry, Meeza), tokenization support, and webhook processing.
+* **Compatibility:** Laravel 10, 11, 12, 13; PHP 8.2+.
 
-### 2. Rename namespaces
+## Features
 
-Replace:
+- **Invoice Management:** Create invoices, retrieve data, and verify payment status.
+- **Payment Gateway:** Support for multiple payment methods including redirect, Fawry, and Meeza.
+- **Tokenization:** Manage card tokenization, including creating screens and deleting tokens.
+- **Webhook Support:** Secure signature verification and automated DTO parsing for webhook events.
+- **Data Transfer Objects:** Strict typing with DTOs for requests and responses.
 
-```
-ElFarmawy\Template
-```
+## Installation
 
-with your own package namespace, e.g.:
-
-```
-ElFarmawy\Paymob
-```
-
-### 3. Update composer.json
-
-Edit:
-
-```json
-"name": "elfarmawy/laravel-api-wrapper-template",
-"description": "Template for building Laravel API wrappers."
-```
-
-to match your new package name and purpose.
-
-### 4. Run tests
+Install the package via Composer:
 
 ```bash
-composer install
-composer test
+composer require elfarmawy/fawaterk
 ```
 
----
+The package will automatically register its service provider.
 
-## What’s Included
+## Configuration
 
-- Ready-to-use Laravel service provider and facade setup
-- Config publishing support
-- Custom exception handling
-- PHPUnit + Orchestra Testbench setup
-- Clean class structure to extend and customize
+Publish the configuration file:
 
----
+```bash
+php artisan vendor:publish --tag="fawaterk-config"
+```
 
-## How to Extend
+Update your `.env` file with your Fawaterk credentials:
 
-Once you rename the namespace, you can build your own API wrapper methods:
+```env
+FAWATERK_API_KEY=your_api_key_here
+FAWATERK_MODE=sandbox # or production
+```
+
+Configuration example (`config/fawaterk.php`):
 
 ```php
-namespace ElFarmawy\Paymob\Services;
+return [
+    'api_key' => env('FAWATERK_API_KEY'),
+    'mode' => env('FAWATERK_MODE', 'sandbox'),
+    'base_url' => env('FAWATERK_MODE') === 'production' 
+        ? 'https://api.fawaterk.com/api/v2' 
+        : 'https://staging.fawaterk.com/api/v2',
+];
+```
 
-use Illuminate\Support\Facades\Http;
+## Usage
 
-class PaymobService extends TemplateService
-{
-    public function createPayment(array $payload)
-    {
-        $response = Http::withToken($this->apiKey)
-            ->post($this->baseUrl.'/payment', $payload);
+### Initializing the Client
 
-        return $this->handleResponse($response);
-    }
+The package provides a facade for easy access:
+
+```php
+use ElFarmawy\Fawaterk\Facades\Fawaterk;
+
+// Creating an invoice link
+$invoice = Fawaterk::invoices()->createInvoiceLink($requestData);
+```
+
+### Creating Invoices
+
+```php
+use ElFarmawy\Fawaterk\Data\CreateInvoiceRequest;
+
+$request = new CreateInvoiceRequest([
+    'cartItems' => [...],
+    'customer' => [...],
+    // ...
+]);
+
+$response = Fawaterk::invoices()->createInvoiceLink($request);
+```
+
+### Webhook Verification
+
+```php
+use ElFarmawy\Fawaterk\Services\FawaterkWebhookService;
+
+$service = app(FawaterkWebhookService::class);
+$payload = $request->all();
+$signature = $request->header('X-Fawaterk-Signature');
+
+if ($service->verifySignature($payload, $signature)) {
+    // Process webhook
 }
 ```
 
-And then register it via your own Facade and Service Provider.
+## Error Handling
 
----
+The package throws specific exceptions to handle API failures:
+- `ElFarmawy\Fawaterk\Exceptions\ApiException`: General API error.
+- `ElFarmawy\Fawaterk\Exceptions\RequestException`: Validation or processing error.
+- `ElFarmawy\Fawaterk\Exceptions\WebhookSignatureVerificationException`: Invalid webhook signature.
 
-## Changelog
+## Architecture Notes
 
-See [CHANGELOG](CHANGELOG.md) for updates.
-
-## Contributing
-
-Pull requests are welcome! Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+- **DTO Philosophy:** The package uses Data Transfer Objects for all requests and responses to ensure type safety and facilitate IDE autocompletion.
+- **Thin Abstraction:** We intentionally avoid complex business logic, acting purely as an API gateway.
+- **Documentation Compliance:** Only official endpoints are supported.
 
 ## Security
 
-If you discover a security issue, please email **[tarekelfarmawy@outlook.com](mailto:tarekelfarmawy@outlook.com)**.
+Ensure your webhook endpoint validates the signature provided by Fawaterk to prevent unauthorized access. Always keep your API keys in secure environment variables.
 
-## Credits
+## Changelog
 
-- [Tarek Hesham](https://github.com/TarekHesham)
-- [All Contributors](../../contributors)
+Please see the [CHANGELOG.md](CHANGELOG.md) for more information on what has changed recently.
 
 ## License
 
-The MIT License (MIT).
-See [LICENSE](LICENSE.md) for more information.
+The MIT License (MIT). Please see the [LICENSE](LICENSE) file for more information.
