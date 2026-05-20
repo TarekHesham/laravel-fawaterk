@@ -6,6 +6,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      FAWATERK_API_KEY: ${{ secrets.FAWATERK_API_KEY }}
+
     steps:
       - uses: actions/checkout@v3
 

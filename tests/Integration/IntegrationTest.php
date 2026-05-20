@@ -19,16 +19,25 @@ class IntegrationTest extends TestCase
     {
         parent::setUp();
 
-        config(['fawaterk.api_key' => 'api-key']);
-        config(['fawaterk.mode' => 'sandbox']);
+        $apiKey = env('FAWATERK_API_KEY');
+
+        if (! $apiKey) {
+            $this->markTestSkipped('FAWATERK_API_KEY is not configured.');
+        }
+
+        config([
+            'fawaterk.api_key' => $apiKey,
+            'fawaterk.mode' => 'sandbox',
+        ]);
 
         $config = [
-            'api_key' => 'api-key',
+            'api_key' => $apiKey,
             'mode' => 'sandbox',
             'sandbox_url' => 'https://staging.fawaterk.com/api/v2',
         ];
 
         $client = new FawaterakClient($config);
+
         $this->fawaterk = new Fawaterk($client);
     }
 
