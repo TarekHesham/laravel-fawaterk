@@ -10,11 +10,12 @@ class FailedWebhookData
         public readonly int $invoice_id,
         public readonly string $invoice_key,
         public readonly string $payment_method,
+        public readonly ?string $pay_load,
         public readonly float $amount,
-        public readonly string $currency,
-        public readonly string $customer_name,
-        public readonly string $customer_email,
-        public readonly string $status,
+        public readonly string $paidCurrency, // Changed from currency to paidCurrency
+        public readonly string $errorMessage,
+        public readonly array $response, // As seen in docs, it's an array
+        public readonly string $referenceNumber,
         public readonly string $hashKey,
     ) {
     }
@@ -25,11 +26,12 @@ class FailedWebhookData
             invoice_id: (int) $data['invoice_id'],
             invoice_key: (string) $data['invoice_key'],
             payment_method: (string) $data['payment_method'],
+            pay_load: $data['pay_load'] ?? null,
             amount: (float) $data['amount'],
-            currency: (string) $data['currency'],
-            customer_name: (string) $data['customer_name'],
-            customer_email: (string) $data['customer_email'],
-            status: (string) $data['status'],
+            paidCurrency: (string) $data['paidCurrency'], // Changed from currency to paidCurrency
+            errorMessage: (string) $data['errorMessage'],
+            response: (array) $data['response'],
+            referenceNumber: (string) $data['referenceNumber'],
             hashKey: (string) $data['hashKey'],
         );
     }

@@ -22,10 +22,6 @@ class FawaterkWebhookService
 
     public function verifySignature(array $payload, string $webhookType): bool
     {
-        // Implement signature verification logic here
-        // The expected queryParams for HMAC SHA256 vary by webhookType
-        // Example for 'paid': invoice_id, invoice_key, payment_method, amount, currency, customer_name, customer_email, status
-
         $hashKey = $payload['hashKey'] ?? null;
         if (! $hashKey) {
             return false;
