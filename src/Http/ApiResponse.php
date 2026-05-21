@@ -30,10 +30,6 @@ class ApiResponse
         private readonly array $raw,
     ) {}
 
-    // -------------------------------------------------------------------------
-    // Factory
-    // -------------------------------------------------------------------------
-
     /**
      * Build an ApiResponse from the decoded JSON body and HTTP status code.
      *
@@ -56,10 +52,6 @@ class ApiResponse
             raw: $body,
         );
     }
-
-    // -------------------------------------------------------------------------
-    // Accessors
-    // -------------------------------------------------------------------------
 
     public function __get(string $key): mixed
     {

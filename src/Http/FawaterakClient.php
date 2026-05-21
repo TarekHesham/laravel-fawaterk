@@ -25,7 +25,7 @@ use ElFarmawy\Fawaterk\Exceptions\ValidationException;
  *  - Returns typed ApiResponse objects
  *
  * This class is intentionally kept small. It knows nothing about specific
- * Fawaterak endpoints — that concern belongs to endpoint classes.
+ * Fawaterak endpoints, that concern belongs to endpoint classes.
  */
 class FawaterakClient
 {
@@ -38,10 +38,6 @@ class FawaterakClient
     {
         $this->baseUrl = $this->resolveBaseUrl();
     }
-
-    // -------------------------------------------------------------------------
-    // Public HTTP methods
-    // -------------------------------------------------------------------------
 
     /**
      * Send a GET request to the given endpoint path.
@@ -75,10 +71,6 @@ class FawaterakClient
         return $this->parseResponse($response);
     }
 
-    // -------------------------------------------------------------------------
-    // Configuration helpers
-    // -------------------------------------------------------------------------
-
     /** The base URL currently in use (sandbox or production). */
     public function getBaseUrl(): string
     {
@@ -91,19 +83,15 @@ class FawaterakClient
         return ($this->config['mode'] ?? 'sandbox') === 'sandbox';
     }
 
-    // -------------------------------------------------------------------------
-    // Internal helpers
-    // -------------------------------------------------------------------------
-
     /**
      * Build a fully-configured PendingRequest ready for sending.
      */
     private function buildRequest(): PendingRequest
     {
-        $timeout = (int) ($this->config['timeout'] ?? 30);
-        $retries = (int) ($this->config['retries'] ?? 1);
-        $retryDelay = (int) ($this->config['retry_delay'] ?? 500);
-        $apiKey = (string) ($this->config['api_key'] ?? '');
+        $timeout    = (int)    ($this->config['timeout']     ?? 30);
+        $retries    = (int)    ($this->config['retries']     ?? 1);
+        $retryDelay = (int)    ($this->config['retry_delay'] ?? 500);
+        $apiKey     = (string) ($this->config['api_key']     ?? '');
 
         $request = Http::withToken($apiKey)
             ->acceptJson()
@@ -156,8 +144,8 @@ class FawaterakClient
 
         // Normalise HTTP errors into typed exceptions.
         if ($response->failed()) {
-           $apiMessage = $body['message'] ?? null;
-            
+            $apiMessage = $body['message'] ?? null;
+
             if (is_array($apiMessage)) {
                 $message = json_encode($apiMessage, JSON_UNESCAPED_UNICODE);
             } else {

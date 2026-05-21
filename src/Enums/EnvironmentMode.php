@@ -6,6 +6,6 @@ namespace ElFarmawy\Fawaterk\Enums;
 
 enum EnvironmentMode: string
 {
-    case SANDBOX = 'sandbox';
+    case SANDBOX    = 'sandbox';
     case PRODUCTION = 'production';
 }

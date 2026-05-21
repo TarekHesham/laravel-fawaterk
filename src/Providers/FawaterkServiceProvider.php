@@ -15,9 +15,7 @@ use ElFarmawy\Fawaterk\Http\FawaterakClient;
  *  - Publish and merge the fawaterk config file.
  *  - Bind FawaterakClient as a singleton with its config resolved.
  *  - Bind the Fawaterk coordinator as a singleton.
- *
- * Rules (from RULES.md):
- *  - Never place endpoint logic inside the service provider.
+ * 
  */
 class FawaterkServiceProvider extends ServiceProvider
 {

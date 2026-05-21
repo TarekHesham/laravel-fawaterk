@@ -39,11 +39,11 @@ class FawaterkWebhookService
         }
 
         return match ($webhookType) {
-            'paid' => PaidWebhookData::fromArray($payload),
+            'paid'     => PaidWebhookData::fromArray($payload),
             'canceled' => CanceledWebhookData::fromArray($payload),
-            'failed' => FailedWebhookData::fromArray($payload),
-            'refund' => RefundWebhookData::fromArray($payload),
-            default => throw new \InvalidArgumentException('Unknown webhook type.'),
+            'failed'   => FailedWebhookData::fromArray($payload),
+            'refund'   => RefundWebhookData::fromArray($payload),
+            default    => throw new \InvalidArgumentException('Unknown webhook type.'),
         };
     }
 
@@ -52,7 +52,7 @@ class FawaterkWebhookService
         try {
             return $this->verifySignature($payload, $webhookType);
         } catch (\Throwable $e) {
-            Log::error('Fawaterk webhook signature verification failed: '.$e->getMessage(), ['exception' => $e]);
+            Log::error('Fawaterk webhook signature verification failed: ' . $e->getMessage(), ['exception' => $e]);
 
             return false;
         }
@@ -82,11 +82,9 @@ class FawaterkWebhookService
                 break;
             case 'refund':
                 // Hash key generation is not documented for refund webhooks.
-                // According to web-hook.md, the refund payload does not include hashKey.
-                // Thus, no hash can be generated or verified.
                 return '';
             default:
-                throw new \InvalidArgumentException('Unknown webhook type for hash generation: '.$webhookType);
+                throw new \InvalidArgumentException('Unknown webhook type for hash generation: ' . $webhookType);
         }
 
         return hash_hmac('sha256', $queryParam, $this->vendorKey, false);
