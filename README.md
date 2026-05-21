@@ -43,7 +43,7 @@ The package is intentionally designed to feel natural inside Laravel application
 # Features
 
 - ✅ Invoice creation and payment verification
-- ✅ Redirect, Meeza, and Fawry payment support
+- ✅ Comprehensive Payment Support: Seamless integration for Cards, Installments, Mobile Wallets, Meeza, Fawry, Aman, and Basata.
 - ✅ Payment methods retrieval
 - ✅ Card tokenization support
 - ✅ Typed DTO request & response objects

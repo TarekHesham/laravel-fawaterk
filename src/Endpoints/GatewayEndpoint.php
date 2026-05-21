@@ -12,6 +12,8 @@ use ElFarmawy\Fawaterk\Data\Gateway\Responses\InitPayMeezaResponse;
 use ElFarmawy\Fawaterk\Data\Gateway\Responses\InitPayRedirectResponse;
 use ElFarmawy\Fawaterk\Data\Gateway\Requests\InitPayRequest;
 use ElFarmawy\Fawaterk\Data\Gateway\Requests\TokenizationPayRequest;
+use ElFarmawy\Fawaterk\Data\Gateway\Responses\InitPayAmanResponse;
+use ElFarmawy\Fawaterk\Data\Gateway\Responses\InitPayBastaResponse;
 use ElFarmawy\Fawaterk\Data\Gateway\Responses\PaymentMethodResponse;
 use ElFarmawy\Fawaterk\Http\BaseEndpoint;
 use ElFarmawy\Fawaterk\Http\ApiResponse;
@@ -76,7 +78,7 @@ class GatewayEndpoint extends BaseEndpoint
     /**
      * Resolve the InitPay response into the correct DTO.
      */
-    private function resolveInitPayResponse(ApiResponse $response): InitPayRedirectResponse|InitPayFawryResponse|InitPayMeezaResponse
+    private function resolveInitPayResponse(ApiResponse $response): InitPayRedirectResponse|InitPayFawryResponse|InitPayMeezaResponse|InitPayAmanResponse|InitPayBastaResponse
     {
         $paymentData = $response->get('payment_data');
 
@@ -92,10 +94,14 @@ class GatewayEndpoint extends BaseEndpoint
             return InitPayMeezaResponse::fromApiResponse($response);
         }
 
-        // If none of the specific types match, it means an unknown payment method
-        // or a different response structure. In a real scenario, this might
-        // throw a custom exception or return a generic error response.
-        // For now, we'll throw a generic API exception.
+        if (isset($paymentData['amanCode'])) {
+            return InitPayAmanResponse::fromApiResponse($response);
+        }
+
+        if (isset($paymentData['masaryCode'])) {
+            return InitPayBastaResponse::fromApiResponse($response);
+        }
+
         throw new ApiException(
             message: 'Unknown InitPay response type',
             context: $response->raw(),
