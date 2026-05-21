@@ -2,11 +2,15 @@
 
 declare(strict_types=1);
 
-namespace ElFarmawy\Fawaterk\Data;
+namespace ElFarmawy\Fawaterk\Data\Invoices\Requests;
 
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\CartItemData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\CustomerData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\DiscountData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\RedirectionUrlsData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\TaxData;
 use ElFarmawy\Fawaterk\Enums\Currency;
 use ElFarmawy\Fawaterk\Enums\Frequency;
-use RuntimeException;
 
 final class CreateInvoiceBuilder
 {
@@ -113,16 +117,22 @@ final class CreateInvoiceBuilder
     public function build(): CreateInvoiceRequest
     {
         if ($this->cartTotal === null) {
-            throw new RuntimeException('cartTotal is required.');
+            throw new \InvalidArgumentException('cartTotal is required.');
         }
         if ($this->currency === null) {
-            throw new RuntimeException('currency is required.');
+            throw new \InvalidArgumentException('currency is required.');
         }
         if ($this->customer === null) {
-            throw new RuntimeException('customer is required.');
+            throw new \InvalidArgumentException('customer is required.');
         }
-        if ($this->cartItems === null) {
-            throw new RuntimeException('cartItems is required.');
+        if (empty($this->cartItems)) {
+            throw new \InvalidArgumentException('cartItems is required.');
+        }
+
+        foreach ($this->cartItems as $index => $item) {
+            if (! $item instanceof CartItemData) {
+                throw new \InvalidArgumentException("Item at index {$index} must be an instance of CartItemData.");
+            }
         }
 
         return new CreateInvoiceRequest(

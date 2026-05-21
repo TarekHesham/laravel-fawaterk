@@ -2,8 +2,13 @@
 
 declare(strict_types=1);
 
-namespace ElFarmawy\Fawaterk\Data;
+namespace ElFarmawy\Fawaterk\Data\Invoices\Requests;
 
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\CartItemData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\CustomerData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\DiscountData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\RedirectionUrlsData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\TaxData;
 use ElFarmawy\Fawaterk\Enums\Currency;
 use ElFarmawy\Fawaterk\Enums\Frequency;
 
@@ -13,7 +18,6 @@ final class CreateInvoiceRequest
      * @param array<CartItemData> $cartItems
      * @param array<string, mixed>|null $payLoad Custom fields to persist between send/receive steps.
      * @param string|null $dueDate Format: Y-m-d.
-     * @param array<string, mixed>|null $payLoad
      */
     public function __construct(
         public readonly float $cartTotal, // Mandatory

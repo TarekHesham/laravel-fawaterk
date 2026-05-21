@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace ElFarmawy\Fawaterk\Endpoints;
 
-use ElFarmawy\Fawaterk\Data\Gateway\CreateCardTokenizationRequest;
-use ElFarmawy\Fawaterk\Data\Gateway\CreateTokenScreenRequest;
-use ElFarmawy\Fawaterk\Data\Gateway\DeleteTokenRequest;
-use ElFarmawy\Fawaterk\Data\Gateway\InitPayFawryResponse;
-use ElFarmawy\Fawaterk\Data\Gateway\InitPayMeezaResponse;
-use ElFarmawy\Fawaterk\Data\Gateway\InitPayRedirectResponse;
-use ElFarmawy\Fawaterk\Data\Gateway\InitPayRequest;
-use ElFarmawy\Fawaterk\Data\Gateway\TokenizationPayRequest;
-use ElFarmawy\Fawaterk\Data\PaymentMethodResponse;
+use ElFarmawy\Fawaterk\Data\Gateway\Requests\CreateCardTokenizationRequest;
+use ElFarmawy\Fawaterk\Data\Gateway\Requests\CreateTokenScreenRequest;
+use ElFarmawy\Fawaterk\Data\Gateway\Requests\DeleteTokenRequest;
+use ElFarmawy\Fawaterk\Data\Gateway\Responses\InitPayFawryResponse;
+use ElFarmawy\Fawaterk\Data\Gateway\Responses\InitPayMeezaResponse;
+use ElFarmawy\Fawaterk\Data\Gateway\Responses\InitPayRedirectResponse;
+use ElFarmawy\Fawaterk\Data\Gateway\Requests\InitPayRequest;
+use ElFarmawy\Fawaterk\Data\Gateway\Requests\TokenizationPayRequest;
+use ElFarmawy\Fawaterk\Data\Gateway\Responses\PaymentMethodResponse;
 use ElFarmawy\Fawaterk\Http\BaseEndpoint;
 use ElFarmawy\Fawaterk\Http\ApiResponse;
 use ElFarmawy\Fawaterk\Exceptions\ApiException;
@@ -38,7 +38,7 @@ class GatewayEndpoint extends BaseEndpoint
             $paymentMethodsData = [];
         }
 
-        return array_map(fn (array $data) => PaymentMethodResponse::fromArray($data), $paymentMethodsData);
+        return array_map(fn(array $data) => PaymentMethodResponse::fromArray($data), $paymentMethodsData);
     }
 
     /**

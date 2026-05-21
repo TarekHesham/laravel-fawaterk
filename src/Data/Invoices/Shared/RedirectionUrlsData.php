@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ElFarmawy\Fawaterk\Data;
+namespace ElFarmawy\Fawaterk\Data\Invoices\Shared;
 
 final class RedirectionUrlsData
 {
@@ -11,8 +11,7 @@ final class RedirectionUrlsData
         public readonly ?string $failUrl = null,
         public readonly ?string $pendingUrl = null,
         public readonly ?string $webhookUrl = null,
-    ) {
-    }
+    ) {}
 
     /**
      * @param array<string, mixed> $data

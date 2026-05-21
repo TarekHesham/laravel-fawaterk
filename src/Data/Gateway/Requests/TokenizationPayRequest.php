@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ElFarmawy\Fawaterk\Data\Gateway;
+namespace ElFarmawy\Fawaterk\Data\Gateway\Requests;
 
 use ElFarmawy\Fawaterk\Enums\Currency;
 

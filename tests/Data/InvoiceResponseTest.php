@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use ElFarmawy\Fawaterk\Data\InvoiceResponse;
+use ElFarmawy\Fawaterk\Data\Invoices\Responses\InvoiceResponse;
 use ElFarmawy\Fawaterk\Http\ApiResponse;
 
 describe('InvoiceResponse', function (): void {
-    
+
     it('can be created from ApiResponse', function (): void {
         $apiResponse = new ApiResponse(
             successful: true,
@@ -24,7 +24,7 @@ describe('InvoiceResponse', function (): void {
         );
 
         $response = InvoiceResponse::fromApiResponse($apiResponse);
-        
+
         expect($response->successful)->toBeTrue()
             ->and($response->status)->toBe(200)
             ->and($response->message)->toBe('Invoice created')
@@ -43,11 +43,10 @@ describe('InvoiceResponse', function (): void {
         );
 
         $response = InvoiceResponse::fromApiResponse($apiResponse);
-        
+
         expect($response->successful)->toBeFalse()
             ->and($response->status)->toBe(400)
             ->and($response->message)->toBe('Error occurred')
             ->and($response->data)->toBeNull();
     });
-
 });

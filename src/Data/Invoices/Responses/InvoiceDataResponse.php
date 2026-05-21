@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ElFarmawy\Fawaterk\Data;
+namespace ElFarmawy\Fawaterk\Data\Invoices\Responses;
+
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\CustomerData;
 
 final class InvoiceDataResponse
 {

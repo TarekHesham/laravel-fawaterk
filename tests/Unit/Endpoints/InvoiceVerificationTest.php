@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use ElFarmawy\Fawaterk\Data\InvoiceResponse;
+use ElFarmawy\Fawaterk\Data\Invoices\Responses\InvoiceResponse;
 use ElFarmawy\Fawaterk\Endpoints\InvoiceEndpoint;
 use ElFarmawy\Fawaterk\Exceptions\ApiException;
 use ElFarmawy\Fawaterk\Exceptions\RequestException;
@@ -78,11 +78,12 @@ it('throws RequestException if invoice status is not paid', function () {
     $this->invoiceEndpoint->verifyPaidInvoice($invoiceId);
 })->throws(RequestException::class, "Invoice with ID 789 has a status of 'pending', expected 'paid'.");
 
-it('throws RequestException on API exception during data retrieval', function () {
+it('propels ApiException when getInvoiceData fails', function () {
     $invoiceId = 101;
+
     $this->invoiceEndpoint->shouldReceive('getInvoiceData')
         ->with($invoiceId)
-        ->andThrow(new ApiException('API Error', 0, [])); // Pass array for context
+        ->andThrow(new ApiException('API Error', 400, []));
 
     $this->invoiceEndpoint->verifyPaidInvoice($invoiceId);
-})->throws(RequestException::class, "Failed to retrieve invoice data for ID 101: API Error");
+})->throws(ApiException::class, "API Error");

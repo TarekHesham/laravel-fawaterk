@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ElFarmawy\Fawaterk\Data\Gateway;
+namespace ElFarmawy\Fawaterk\Data\Gateway\Requests;
 
-use ElFarmawy\Fawaterk\Data\CustomerData;
-use ElFarmawy\Fawaterk\Data\CreateInvoiceRequest as OrderData;
-use ElFarmawy\Fawaterk\Data\RedirectionUrlsData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\CustomerData;
+use ElFarmawy\Fawaterk\Data\Invoices\Requests\CreateInvoiceRequest as OrderData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\RedirectionUrlsData;
 
 class CreateTokenScreenRequest
 {

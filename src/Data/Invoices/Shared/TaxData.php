@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace ElFarmawy\Fawaterk\Data;
+namespace ElFarmawy\Fawaterk\Data\Invoices\Shared;
 
 use InvalidArgumentException;
 
-final class DiscountData
+final class TaxData
 {
     public function __construct(
-        public readonly string $type,
+        public readonly string $title,
         public readonly float $value,
     ) {
-        if (! in_array($this->type, ['pcg', 'literal'], true)) {
-            throw new InvalidArgumentException('Discount type must be either "pcg" or "literal".');
+        if (trim($this->title) === '') {
+            throw new InvalidArgumentException('Tax title cannot be empty.');
         }
         if ($this->value < 0) {
-            throw new InvalidArgumentException('Discount value cannot be negative.');
+            throw new InvalidArgumentException('Tax value cannot be negative.');
         }
     }
 
@@ -26,7 +26,7 @@ final class DiscountData
     public static function fromArray(array $data): self
     {
         return new self(
-            type: $data['type'] ?? throw new InvalidArgumentException('Missing required field: type'),
+            title: $data['title'] ?? throw new InvalidArgumentException('Missing required field: title'),
             value: (float) ($data['value'] ?? throw new InvalidArgumentException('Missing required field: value')),
         );
     }
@@ -37,7 +37,7 @@ final class DiscountData
     public function toArray(): array
     {
         return [
-            'type' => $this->type,
+            'title' => $this->title,
             'value' => $this->value,
         ];
     }

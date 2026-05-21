@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use ElFarmawy\Fawaterk\Data\CustomerData;
-use ElFarmawy\Fawaterk\Data\CreateInvoiceRequest as OrderData;
-use ElFarmawy\Fawaterk\Data\RedirectionUrlsData;
-use ElFarmawy\Fawaterk\Data\Gateway\CreateTokenScreenRequest;
-use ElFarmawy\Fawaterk\Data\Gateway\CreateCardTokenizationRequest;
-use ElFarmawy\Fawaterk\Data\Gateway\TokenizationPayRequest;
-use ElFarmawy\Fawaterk\Data\Gateway\DeleteTokenRequest;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\CustomerData;
+use ElFarmawy\Fawaterk\Data\Invoices\Requests\CreateInvoiceRequest as OrderData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\RedirectionUrlsData;
+use ElFarmawy\Fawaterk\Data\Gateway\Requests\CreateTokenScreenRequest;
+use ElFarmawy\Fawaterk\Data\Gateway\Requests\CreateCardTokenizationRequest;
+use ElFarmawy\Fawaterk\Data\Gateway\Requests\TokenizationPayRequest;
+use ElFarmawy\Fawaterk\Data\Gateway\Requests\DeleteTokenRequest;
 use ElFarmawy\Fawaterk\Endpoints\GatewayEndpoint;
 use ElFarmawy\Fawaterk\Enums\Currency;
 use ElFarmawy\Fawaterk\Http\FawaterakClient;

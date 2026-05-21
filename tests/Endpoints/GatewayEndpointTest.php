@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use ElFarmawy\Fawaterk\Data\CartItemData;
-use ElFarmawy\Fawaterk\Data\CustomerData;
-use ElFarmawy\Fawaterk\Data\Gateway\InitPayFawryResponse;
-use ElFarmawy\Fawaterk\Data\Gateway\InitPayMeezaResponse;
-use ElFarmawy\Fawaterk\Data\Gateway\InitPayRedirectResponse;
-use ElFarmawy\Fawaterk\Data\Gateway\InitPayRequest;
-use ElFarmawy\Fawaterk\Data\PaymentMethodResponse;
-use ElFarmawy\Fawaterk\Data\RedirectionUrlsData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\CartItemData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\CustomerData;
+use ElFarmawy\Fawaterk\Data\Gateway\Responses\InitPayFawryResponse;
+use ElFarmawy\Fawaterk\Data\Gateway\Responses\InitPayMeezaResponse;
+use ElFarmawy\Fawaterk\Data\Gateway\Responses\InitPayRedirectResponse;
+use ElFarmawy\Fawaterk\Data\Gateway\Requests\InitPayRequest;
+use ElFarmawy\Fawaterk\Data\Gateway\Responses\PaymentMethodResponse;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\RedirectionUrlsData;
 use ElFarmawy\Fawaterk\Enums\Currency;
 use ElFarmawy\Fawaterk\Endpoints\GatewayEndpoint;
 use ElFarmawy\Fawaterk\Http\FawaterakClient;

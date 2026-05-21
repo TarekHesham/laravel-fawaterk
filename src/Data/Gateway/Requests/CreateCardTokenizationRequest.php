@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ElFarmawy\Fawaterk\Data\Gateway;
+namespace ElFarmawy\Fawaterk\Data\Gateway\Requests;
 
-use ElFarmawy\Fawaterk\Data\CustomerData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\CustomerData;
 
 class CreateCardTokenizationRequest
 {

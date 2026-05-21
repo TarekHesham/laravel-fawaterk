@@ -53,7 +53,7 @@ class IntegrationTest extends TestCase
     {
         $endpoint = new \ElFarmawy\Fawaterk\Endpoints\InvoiceEndpoint($this->fawaterk->client());
 
-        $customer = new \ElFarmawy\Fawaterk\Data\CustomerData(
+        $customer = new \ElFarmawy\Fawaterk\Data\Invoices\Shared\CustomerData(
             firstName: 'Mohammad',
             lastName: 'Hamza',
             email: 'test@fawaterk.com',
@@ -62,14 +62,14 @@ class IntegrationTest extends TestCase
         );
 
         $cartItems = [
-            new \ElFarmawy\Fawaterk\Data\CartItemData(
+            new \ElFarmawy\Fawaterk\Data\Invoices\Shared\CartItemData(
                 name: 'Test Product',
                 price: 25.0,
                 quantity: 1
             )
         ];
 
-        $request = new \ElFarmawy\Fawaterk\Data\CreateInvoiceRequest(
+        $request = new \ElFarmawy\Fawaterk\Data\Invoices\Requests\CreateInvoiceRequest(
             cartTotal: 25.0,
             currency: \ElFarmawy\Fawaterk\Enums\Currency::EGP,
             customer: $customer,
@@ -87,7 +87,7 @@ class IntegrationTest extends TestCase
     {
         $endpoint = new \ElFarmawy\Fawaterk\Endpoints\InvoiceEndpoint($this->fawaterk->client());
 
-        $customer = new \ElFarmawy\Fawaterk\Data\CustomerData(
+        $customer = new \ElFarmawy\Fawaterk\Data\Invoices\Shared\CustomerData(
             firstName: 'Mohammad',
             lastName: 'Hamza',
             email: 'test@fawaterk.com',
@@ -96,14 +96,14 @@ class IntegrationTest extends TestCase
         );
 
         $cartItems = [
-            new \ElFarmawy\Fawaterk\Data\CartItemData(
+            new \ElFarmawy\Fawaterk\Data\Invoices\Shared\CartItemData(
                 name: 'Test Product',
                 price: 25.0,
                 quantity: 1
             )
         ];
 
-        $request = new \ElFarmawy\Fawaterk\Data\CreateInvoiceRequest(
+        $request = new \ElFarmawy\Fawaterk\Data\Invoices\Requests\CreateInvoiceRequest(
             cartTotal: 25.0,
             currency: \ElFarmawy\Fawaterk\Enums\Currency::EGP,
             customer: $customer,

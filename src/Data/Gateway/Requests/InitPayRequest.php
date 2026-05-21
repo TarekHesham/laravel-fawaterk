@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace ElFarmawy\Fawaterk\Data\Gateway;
+namespace ElFarmawy\Fawaterk\Data\Gateway\Requests;
 
 use Carbon\Carbon;
-use ElFarmawy\Fawaterk\Data\CartItemData;
-use ElFarmawy\Fawaterk\Data\CustomerData;
-use ElFarmawy\Fawaterk\Data\DiscountData;
-use ElFarmawy\Fawaterk\Data\RedirectionUrlsData;
-use ElFarmawy\Fawaterk\Data\TaxData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\CartItemData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\CustomerData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\DiscountData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\RedirectionUrlsData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\TaxData;
 use ElFarmawy\Fawaterk\Enums\Currency;
 use ElFarmawy\Fawaterk\Enums\Frequency;
 use ElFarmawy\Fawaterk\Enums\Language;
@@ -39,8 +39,7 @@ final class InitPayRequest
         public readonly ?bool $sendSMS = null,
         public readonly ?Language $lang = null,
         public readonly ?bool $redirectOption = null, // default false
-    ) {
-    }
+    ) {}
 
     public function toArray(): array
     {
@@ -51,7 +50,7 @@ final class InitPayRequest
             'invoice_number' => $this->invoice_number,
             'customer' => $this->customer->toArray(),
             'redirectionUrls' => $this->redirectionUrls?->toArray(),
-            'cartItems' => array_map(fn (CartItemData $item) => $item->toArray(), $this->cartItems),
+            'cartItems' => array_map(fn(CartItemData $item) => $item->toArray(), $this->cartItems),
             'frequency' => $this->frequency?->value,
             'customExpireDate' => $this->customExpireDate,
             'discountData' => $this->discountData?->toArray(),
@@ -64,6 +63,6 @@ final class InitPayRequest
             'sendSMS' => $this->sendSMS,
             'lang' => $this->lang?->value,
             'redirectOption' => $this->redirectOption,
-        ], fn ($value) => $value !== null);
+        ], fn($value) => $value !== null);
     }
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ElFarmawy\Fawaterk\Data;
+namespace ElFarmawy\Fawaterk\Data\Gateway\Responses;
 
 final class PaymentMethodResponse
 {
@@ -12,8 +12,7 @@ final class PaymentMethodResponse
         public readonly string $nameAr,
         public readonly string $logo,
         public readonly bool $redirect,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

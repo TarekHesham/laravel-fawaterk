@@ -61,6 +61,31 @@ class ApiResponse
     // Accessors
     // -------------------------------------------------------------------------
 
+    public function __get(string $key): mixed
+    {
+        if (is_array($this->data)) {
+            return data_get($this->data, $key);
+        }
+
+        if (is_object($this->data)) {
+            return $this->data->{$key} ?? null;
+        }
+
+        return null;
+    }
+
+    public function object(): ?object
+    {
+        return is_array($this->data) ? (object) $this->data : null;
+    }
+
+    public function collect(?string $key = null): \Illuminate\Support\Collection
+    {
+        $targetData = $key ? data_get($this->data, $key) : $this->data;
+
+        return collect($targetData);
+    }
+
     /** Whether the API reported a successful result. */
     public function successful(): bool
     {

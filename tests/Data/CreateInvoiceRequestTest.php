@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-use ElFarmawy\Fawaterk\Data\CreateInvoiceRequest;
-use ElFarmawy\Fawaterk\Data\CustomerData;
-use ElFarmawy\Fawaterk\Data\CartItemData;
+use ElFarmawy\Fawaterk\Data\Invoices\Requests\CreateInvoiceRequest;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\CustomerData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\CartItemData;
 use ElFarmawy\Fawaterk\Enums\Currency;
 use ElFarmawy\Fawaterk\Enums\Frequency;
 
 describe('CreateInvoiceRequest', function (): void {
-    
+
     it('can be instantiated and converted to array', function (): void {
         $customer = new CustomerData(firstName: 'John', lastName: 'Doe', email: 'john@example.com');
         $item = new CartItemData(name: 'Item 1', price: 100.0, quantity: 1);
-        
+
         $request = new CreateInvoiceRequest(
             cartTotal: 100.0,
             currency: Currency::EGP,
@@ -23,15 +23,15 @@ describe('CreateInvoiceRequest', function (): void {
             frequency: Frequency::WEEKLY,
             sendSMS: true,
             sendEmail: false,
-            discountData: new \ElFarmawy\Fawaterk\Data\DiscountData('pcg', 10),
-            taxData: new \ElFarmawy\Fawaterk\Data\TaxData('VAT', 14),
+            discountData: new \ElFarmawy\Fawaterk\Data\Invoices\Shared\DiscountData('pcg', 10),
+            taxData: new \ElFarmawy\Fawaterk\Data\Invoices\Shared\TaxData('VAT', 14),
             payLoad: ['custom_key' => 'custom_value'],
             dueDate: '2026-10-10',
-            redirectionUrls: new \ElFarmawy\Fawaterk\Data\RedirectionUrlsData(successUrl: 'https://example.com/callback')
+            redirectionUrls: new \ElFarmawy\Fawaterk\Data\Invoices\Shared\RedirectionUrlsData(successUrl: 'https://example.com/callback')
         );
 
         $array = $request->toArray();
-        
+
         expect($array)->toBeArray()
             ->and($array['cartTotal'])->toBe('100')
             ->and($array['currency'])->toBe('EGP')
@@ -51,7 +51,7 @@ describe('CreateInvoiceRequest', function (): void {
     it('excludes null optional properties from array', function (): void {
         $customer = new CustomerData(firstName: 'John', lastName: 'Doe');
         $item = new CartItemData(name: 'Item 1', price: 100.0, quantity: 1);
-        
+
         $request = new CreateInvoiceRequest(
             cartTotal: 100.0,
             currency: Currency::EGP,
@@ -60,12 +60,11 @@ describe('CreateInvoiceRequest', function (): void {
         );
 
         $array = $request->toArray();
-        
+
         expect($array)->not->toHaveKey('shipping')
             ->not->toHaveKey('frequency')
             ->not->toHaveKey('sendSMS')
             ->not->toHaveKey('sendEmail')
             ->not->toHaveKey('redirectUrl');
     });
-
 });
