@@ -91,10 +91,10 @@ The package is intentionally designed to feel natural inside Laravel application
 
 # Requirements
 
-| Dependency | Version          |
-| ---------- | ---------------- |
-| PHP        | 8.2+             |
-| Laravel    | 10.x, 11.x, 12.x |
+| Dependency | Version                |
+| ---------- | ---------------------- |
+| PHP        | 8.2+                   |
+| Laravel    | 10.x, 11.x, 12.x, 13.x |
 
 ---
 

@@ -3,7 +3,7 @@
   "description": "Production-ready Laravel SDK for the Fawaterak payment gateway",
   "type": "library",
   "license": "MIT",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "keywords": [
     "elfarmawy",
     "laravel",
