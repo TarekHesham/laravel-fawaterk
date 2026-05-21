@@ -1,7 +1,7 @@
 # Laravel Fawaterk
 
 <p align="center">
-    <img src="https://banners.beyondco.de/Laravel%20Fawaterk.png?theme=light&packageManager=composer+require&packageName=elfarmawy%2Flaravel-fawaterk&pattern=architect&style=style_1&description=Modern+Laravel+SDK+for+the+Fawaterk+payment+gateway&md=1&showWatermark=0&fontSize=90px&images=credit-card" alt="Laravel Fawaterk">
+    <img src="https://banners.beyondco.de/Laravel%20Fawaterk.png?theme=light&packageManager=composer+require&packageName=elfarmawy%2Flaravel-fawaterk&pattern=architect&style=style_1&description=Modern+Laravel+SDK+for+the+Fawaterk+payment+gateway&md=1&showWatermark=0&fontSize=90px&images=credit-card" alt="Laravel Fawaterk" width="80%">
 </p>
 <p align="center">
 <a href="https://packagist.org/packages/elfarmawy/laravel-fawaterk"><img src="https://img.shields.io/packagist/v/elfarmawy/laravel-fawaterk.svg?style=flat-square" alt="Latest Version on Packagist"></a>
@@ -43,7 +43,7 @@ The package is intentionally designed to feel natural inside Laravel application
 # Features
 
 - ✅ Invoice creation and payment verification
-- ✅ Comprehensive Payment Support: Seamless integration for Cards, Installments, Mobile Wallets, Meeza, Fawry, Aman, and Basata.
+- ✅ Seamless integration for Cards, Installments, Mobile Wallets, Meeza, Fawry, Aman, and Basata.
 - ✅ Payment methods retrieval
 - ✅ Card tokenization support
 - ✅ Typed DTO request & response objects
