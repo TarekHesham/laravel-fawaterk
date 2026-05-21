@@ -44,4 +44,9 @@ class Fawaterk
     {
         return new \ElFarmawy\Fawaterk\Endpoints\InvoiceEndpoint($this->client);
     }
+
+    public function gateway(): \ElFarmawy\Fawaterk\Endpoints\GatewayEndpoint
+    {
+        return new \ElFarmawy\Fawaterk\Endpoints\GatewayEndpoint($this->client);
+    }
 }
