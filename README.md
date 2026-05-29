@@ -42,19 +42,19 @@ The package is intentionally designed to feel natural inside Laravel application
 
 # Features
 
-- ✅ Invoice creation and payment verification
-- ✅ Seamless integration for Cards, Installments, Mobile Wallets, Meeza, Fawry, Aman, and Basata.
-- ✅ Payment methods retrieval
-- ✅ Card tokenization support
-- ✅ Typed DTO request & response objects
-- ✅ Fluent request builders
-- ✅ Secure HMAC webhook verification
-- ✅ Immutable readonly objects
-- ✅ Clean architecture
-- ✅ Laravel Facade support
-- ✅ PHPStan-friendly
-- ✅ Pest testing support
-- ✅ Laravel 10, 11, and 12 support
+- Invoice creation and payment verification
+- Seamless integration for Cards, Installments, Mobile Wallets, Meeza, Fawry, Aman, and Basata.
+- Payment methods retrieval
+- Card tokenization support
+- Typed DTO request & response objects
+- Fluent request builders
+- Secure HMAC webhook verification
+- Immutable readonly objects
+- Clean architecture
+- Laravel Facade support
+- PHPStan-friendly
+- Pest testing support
+- Laravel 10, 11, 12, and 13 support
 
 ---
 
@@ -265,6 +265,8 @@ Depending on the selected payment method, the response will automatically resolv
 - `InitPayRedirectResponse`
 - `InitPayFawryResponse`
 - `InitPayMeezaResponse`
+- `InitPayBastaResponse`
+- `InitPayAmanResponse`
 
 ---
 
