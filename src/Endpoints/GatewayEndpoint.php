@@ -26,7 +26,7 @@ class GatewayEndpoint extends BaseEndpoint
      *
      * @return array<int, PaymentMethodResponse>
      */
-    public function getPaymentMethods(): array
+    public function paymentMethods(): array
     {
         $response = $this->client->get('/getPaymentmethods');
         $paymentMethodsData = $response->data();
@@ -40,7 +40,7 @@ class GatewayEndpoint extends BaseEndpoint
     /**
      * Initiate a payment and get the appropriate response based on the payment method.
      */
-    public function invoiceInitPay(InitPayRequest $request): InitPayRedirectResponse|InitPayFawryResponse|InitPayMeezaResponse
+    public function initPay(InitPayRequest $request): InitPayRedirectResponse|InitPayFawryResponse|InitPayMeezaResponse
     {
         $response = $this->client->post('/invoiceInitPay', $request->toArray());
 

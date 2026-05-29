@@ -5,14 +5,13 @@ declare(strict_types=1);
 use ElFarmawy\Fawaterk\Data\Webhooks\CanceledWebhookData;
 use ElFarmawy\Fawaterk\Data\Webhooks\FailedWebhookData;
 use ElFarmawy\Fawaterk\Data\Webhooks\PaidWebhookData;
-use ElFarmawy\Fawaterk\Data\Webhooks\RefundWebhookData;
+use ElFarmawy\Fawaterk\Enums\WebhookType;
 use ElFarmawy\Fawaterk\Exceptions\WebhookSignatureVerificationException;
 use ElFarmawy\Fawaterk\Services\FawaterkWebhookService;
 use Illuminate\Support\Facades\Config;
 
 beforeEach(function () {
-    // Set a dummy vendor key for testing
-    Config::set('fawaterk.vendor_key', 'test_vendor_key');
+    Config::set('fawaterk.api_key', 'test_api_key');
 });
 
 it('can verify a valid paid webhook signature', function () {
@@ -25,11 +24,21 @@ it('can verify a valid paid webhook signature', function () {
         'customer_name' => 'John Doe',
         'customer_email' => 'john@example.com',
         'status' => 'paid',
-        'hashKey' => '3bdb74fb198687079a22a767a173d05c194497e63c3dab27766bc7ed477aec84', // hash_hmac('sha256', 'InvoiceId=12345&InvoiceKey=INV-KEY-PAID&PaymentMethod=CreditCard', 'test_vendor_key')
     ];
 
+    $payload['hashKey'] = hash_hmac(
+        'sha256',
+        sprintf(
+            'InvoiceId=%s&InvoiceKey=%s&PaymentMethod=%s',
+            $payload['invoice_id'],
+            $payload['invoice_key'],
+            $payload['payment_method']
+        ),
+        config('fawaterk.api_key')
+    );
+
     $service = new FawaterkWebhookService();
-    expect($service->verifySignature($payload, 'paid'))->toBeTrue();
+    expect($service->verifySignature($payload, WebhookType::PAID))->toBeTrue();
 });
 
 it('fails to verify an invalid paid webhook signature', function () {
@@ -46,7 +55,7 @@ it('fails to verify an invalid paid webhook signature', function () {
     ];
 
     $service = new FawaterkWebhookService();
-    expect($service->verifySignature($payload, 'paid'))->toBeFalse();
+    expect($service->verifySignature($payload, WebhookType::PAID))->toBeFalse();
 });
 
 it('can verify a valid canceled webhook signature', function () {
@@ -57,11 +66,20 @@ it('can verify a valid canceled webhook signature', function () {
         'pay_load' => null,
         'transactionId' => 123,
         'transactionKey' => 'TRANS-KEY-CANCELED',
-        'hashKey' => '811336183fc4cde17c414d65ede58544e1de15aa75f534d0606b552109d0da80', // hash_hmac('sha256', 'referenceId=REF-CANCELED&PaymentMethod=Fawry', 'test_vendor_key')
     ];
 
+    $payload['hashKey'] = hash_hmac(
+        'sha256',
+        sprintf(
+            'referenceId=%s&PaymentMethod=%s',
+            $payload['referenceId'],
+            $payload['paymentMethod']
+        ),
+        config('fawaterk.api_key')
+    );
+
     $service = new FawaterkWebhookService();
-    expect($service->verifySignature($payload, 'canceled'))->toBeTrue();
+    expect($service->verifySignature($payload, WebhookType::CANCELED))->toBeTrue();
 });
 
 it('fails to verify an invalid canceled webhook signature', function () {
@@ -76,7 +94,7 @@ it('fails to verify an invalid canceled webhook signature', function () {
     ];
 
     $service = new FawaterkWebhookService();
-    expect($service->verifySignature($payload, 'canceled'))->toBeFalse();
+    expect($service->verifySignature($payload, WebhookType::CANCELED))->toBeFalse();
 });
 
 it('can verify a valid failed webhook signature', function () {
@@ -90,11 +108,21 @@ it('can verify a valid failed webhook signature', function () {
         'errorMessage' => 'Payment failed',
         'response' => [],
         'referenceNumber' => '',
-        'hashKey' => '08dab4678b79098b7df1ba9719cb1b58333a03bea2e759d9047db71871246e75', // hash_hmac('sha256', 'InvoiceId=67890&InvoiceKey=INV-KEY-FAILED&PaymentMethod=Card', 'test_vendor_key')
     ];
 
+    $payload['hashKey'] = hash_hmac(
+        'sha256',
+        sprintf(
+            'InvoiceId=%s&InvoiceKey=%s&PaymentMethod=%s',
+            $payload['invoice_id'],
+            $payload['invoice_key'],
+            $payload['payment_method']
+        ),
+        config('fawaterk.api_key')
+    );
+
     $service = new FawaterkWebhookService();
-    expect($service->verifySignature($payload, 'failed'))->toBeTrue();
+    expect($service->verifySignature($payload, WebhookType::FAILED))->toBeTrue();
 });
 
 it('fails to verify an invalid failed webhook signature', function () {
@@ -106,7 +134,7 @@ it('fails to verify an invalid failed webhook signature', function () {
     ];
 
     $service = new FawaterkWebhookService();
-    expect($service->verifySignature($payload, 'failed'))->toBeFalse();
+    expect($service->verifySignature($payload, WebhookType::FAILED))->toBeFalse();
 });
 
 it('always returns false for refund webhook signature verification due to undocumented hash generation', function () {
@@ -121,12 +149,12 @@ it('always returns false for refund webhook signature verification due to undocu
     ];
 
     $service = new FawaterkWebhookService();
-    expect($service->verifySignature($payload, 'refund'))->toBeFalse();
+    expect($service->verifySignature($payload, WebhookType::REFUND))->toBeFalse();
 
     // If a hashKey somehow appears, it should still fail because no hash can be generated
     $payloadWithHash = $payload;
     $payloadWithHash['hashKey'] = 'some-hash';
-    expect($service->verifySignature($payloadWithHash, 'refund'))->toBeFalse();
+    expect($service->verifySignature($payloadWithHash, WebhookType::REFUND))->toBeFalse();
 });
 
 it('parse returns a PaidWebhookData object for "paid" type', function () {
@@ -134,16 +162,26 @@ it('parse returns a PaidWebhookData object for "paid" type', function () {
         'invoice_id' => 12345,
         'invoice_key' => 'INV-KEY-PAID',
         'payment_method' => 'CreditCard',
-        'amount' => 100.00,
-        'currency' => 'EGP',
+        'paidAmount' => 100.00,
+        'paidCurrency' => 'EGP',
         'customer_name' => 'John Doe',
         'customer_email' => 'john@example.com',
-        'status' => 'paid',
-        'hashKey' => '3bdb74fb198687079a22a767a173d05c194497e63c3dab27766bc7ed477aec84',
+        'invoice_status' => 'paid',
     ];
 
+    $payload['hashKey'] = hash_hmac(
+        'sha256',
+        sprintf(
+            'InvoiceId=%s&InvoiceKey=%s&PaymentMethod=%s',
+            $payload['invoice_id'],
+            $payload['invoice_key'],
+            $payload['payment_method']
+        ),
+        config('fawaterk.api_key')
+    );
+
     $service = new FawaterkWebhookService();
-    $dto = $service->parse($payload, 'paid');
+    $dto = $service->verifyAndParse($payload, WebhookType::PAID);
     expect($dto)->toBeInstanceOf(PaidWebhookData::class);
     expect($dto->invoice_id)->toEqual(12345);
 });
@@ -156,11 +194,20 @@ it('parse returns a CanceledWebhookData object for "canceled" type', function ()
         'pay_load' => null,
         'transactionId' => 123,
         'transactionKey' => 'TRANS-KEY-CANCELED',
-        'hashKey' => '811336183fc4cde17c414d65ede58544e1de15aa75f534d0606b552109d0da80',
     ];
 
+    $payload['hashKey'] = hash_hmac(
+        'sha256',
+        sprintf(
+            'referenceId=%s&PaymentMethod=%s',
+            $payload['referenceId'],
+            $payload['paymentMethod']
+        ),
+        config('fawaterk.api_key')
+    );
+
     $service = new FawaterkWebhookService();
-    $dto = $service->parse($payload, 'canceled');
+    $dto = $service->verifyAndParse($payload, WebhookType::CANCELED);
     expect($dto)->toBeInstanceOf(CanceledWebhookData::class);
     expect($dto->referenceId)->toEqual('REF-CANCELED');
 });
@@ -176,11 +223,21 @@ it('parse returns a FailedWebhookData object for "failed" type', function () {
         'errorMessage' => 'Payment failed',
         'response' => [],
         'referenceNumber' => '',
-        'hashKey' => '08dab4678b79098b7df1ba9719cb1b58333a03bea2e759d9047db71871246e75',
     ];
 
+    $payload['hashKey'] = hash_hmac(
+        'sha256',
+        sprintf(
+            'InvoiceId=%s&InvoiceKey=%s&PaymentMethod=%s',
+            $payload['invoice_id'],
+            $payload['invoice_key'],
+            $payload['payment_method']
+        ),
+        config('fawaterk.api_key')
+    );
+
     $service = new FawaterkWebhookService();
-    $dto = $service->parse($payload, 'failed');
+    $dto = $service->verifyAndParse($payload, WebhookType::FAILED);
     expect($dto)->toBeInstanceOf(FailedWebhookData::class);
     expect($dto->invoice_id)->toEqual(67890);
 });
@@ -210,7 +267,7 @@ it('parse returns a RefundWebhookData object for "refund" type (without hash ver
     // This might not be the desired behavior for refunds IF they genuinely don't send a hashKey.
     // For the current implementation, it should throw.
     try {
-        $service->parse($payload, 'refund');
+        $service->verifyAndParse($payload, WebhookType::REFUND);
         $this->fail('WebhookSignatureVerificationException was not thrown for refund webhook without hashKey.');
     } catch (WebhookSignatureVerificationException $e) {
         expect($e->getMessage())->toEqual('Invalid webhook signature.');
@@ -231,7 +288,7 @@ it('parse throws WebhookSignatureVerificationException on invalid signature', fu
     ];
 
     $service = new FawaterkWebhookService();
-    $service->parse($payload, 'paid');
+    $service->verifyAndParse($payload, WebhookType::PAID);
 })->throws(WebhookSignatureVerificationException::class, 'Invalid webhook signature.');
 
 it('safeVerifySignature returns false on invalid signature', function () {
@@ -248,7 +305,7 @@ it('safeVerifySignature returns false on invalid signature', function () {
     ];
 
     $service = new FawaterkWebhookService();
-    expect($service->safeVerifySignature($payload, 'paid'))->toBeFalse();
+    expect($service->safeVerifySignature($payload, WebhookType::PAID))->toBeFalse();
 });
 
 it('safeVerifySignature returns true on valid signature', function () {
@@ -261,11 +318,21 @@ it('safeVerifySignature returns true on valid signature', function () {
         'customer_name' => 'John Doe',
         'customer_email' => 'john@example.com',
         'status' => 'paid',
-        'hashKey' => '3bdb74fb198687079a22a767a173d05c194497e63c3dab27766bc7ed477aec84',
     ];
 
+    $payload['hashKey'] = hash_hmac(
+        'sha256',
+        sprintf(
+            'InvoiceId=%s&InvoiceKey=%s&PaymentMethod=%s',
+            $payload['invoice_id'],
+            $payload['invoice_key'],
+            $payload['payment_method']
+        ),
+        config('fawaterk.api_key')
+    );
+
     $service = new FawaterkWebhookService();
-    expect($service->safeVerifySignature($payload, 'paid'))->toBeTrue();
+    expect($service->safeVerifySignature($payload, WebhookType::PAID))->toBeTrue();
 });
 
 it('safeVerifySignature returns false for refund webhook type', function () {
@@ -280,5 +347,5 @@ it('safeVerifySignature returns false for refund webhook type', function () {
     ];
 
     $service = new FawaterkWebhookService();
-    expect($service->safeVerifySignature($payload, 'refund'))->toBeFalse();
+    expect($service->safeVerifySignature($payload, WebhookType::REFUND))->toBeFalse();
 });

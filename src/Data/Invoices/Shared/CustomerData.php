@@ -12,7 +12,7 @@ final class CustomerData
      * @param string $firstName Alphanumeric, @, -, _, . (Mandatory)
      * @param string $lastName Alphanumeric, @, -, _, . (Mandatory)
      * @param string|null $email (Optional)
-     * @param string|null $phone (Optional)
+     * @param string|null $phone (Optional - Mandatory in case of Mobile Wallet payment method presented)
      * @param string|null $address Alphanumeric, @, -, _, ., ,, : (Optional)
      * @param string|null $customerUniqueId (Mandatory if tokenization is used)
      */
@@ -48,12 +48,12 @@ final class CustomerData
     public static function fromArray(array $data): self
     {
         return new self(
-            firstName: $data['first_name'] ?? throw new InvalidArgumentException('Missing required field: first_name'),
-            lastName: $data['last_name'] ?? throw new InvalidArgumentException('Missing required field: last_name'),
-            email: $data['email'] ?? null,
-            phone: isset($data['phone']) ? (string) $data['phone'] : null,
-            address: $data['address'] ?? null,
-            customerUniqueId: $data['customer_unique_id'] ?? null,
+            $data['first_name'] ?? throw new InvalidArgumentException('Missing required field: first_name'),
+            $data['last_name'] ?? throw new InvalidArgumentException('Missing required field: last_name'),
+            $data['email'] ?? null,
+            isset($data['phone']) ? (string) $data['phone'] : null,
+            $data['address'] ?? null,
+            $data['customer_unique_id'] ?? null,
         );
     }
 
@@ -62,24 +62,13 @@ final class CustomerData
      */
     public function toArray(): array
     {
-        $data = [
+        return array_filter([
             'first_name' => $this->firstName,
             'last_name' => $this->lastName,
-        ];
-
-        if ($this->email !== null) {
-            $data['email'] = $this->email;
-        }
-        if ($this->phone !== null && $this->phone !== '') {
-            $data['phone'] = $this->phone;
-        }
-        if ($this->address !== null) {
-            $data['address'] = $this->address;
-        }
-        if ($this->customerUniqueId !== null) {
-            $data['customer_unique_id'] = $this->customerUniqueId;
-        }
-
-        return $data;
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'address' => $this->address,
+            'customer_unique_id' => $this->customerUniqueId,
+        ], fn($value) => $value !== null);
     }
 }

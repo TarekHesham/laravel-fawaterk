@@ -40,42 +40,21 @@ final class CreateInvoiceRequest
      */
     public function toArray(): array
     {
-        $data = [
-            'cartTotal' => (string) $this->cartTotal,
-            'currency' => $this->currency->value,
-            'customer' => $this->customer->toArray(),
-            'cartItems' => array_map(fn(CartItemData $item) => $item->toArray(), $this->cartItems),
-        ];
-
-        if ($this->shipping !== null) {
-            $data['shipping'] = $this->shipping;
-        }
-        if ($this->frequency !== null) {
-            $data['frequency'] = $this->frequency->value;
-        }
-        if ($this->sendSMS !== null) {
-            $data['sendSMS'] = $this->sendSMS;
-        }
-        if ($this->sendEmail !== null) {
-            $data['sendEmail'] = $this->sendEmail;
-        }
-        if ($this->discountData !== null) {
-            $data['discountData'] = $this->discountData->toArray();
-        }
-        if ($this->taxData !== null) {
-            $data['taxData'] = $this->taxData->toArray();
-        }
-        if ($this->payLoad !== null) {
-            $data['payLoad'] = $this->payLoad;
-        }
-        if ($this->dueDate !== null) {
-            $data['due_date'] = $this->dueDate;
-        }
-        if ($this->redirectionUrls !== null) {
-            $data['redirectionUrls'] = $this->redirectionUrls->toArray();
-        }
-
-        return $data;
+        return array_filter([
+            'cartTotal'       => $this->cartTotal,
+            'currency'        => $this->currency->value,
+            'customer'        => $this->customer->toArray(),
+            'cartItems'       => array_map(fn($item) => $item->toArray(), $this->cartItems),
+            'shipping'        => $this->shipping,
+            'frequency'       => $this->frequency?->value,
+            'sendSMS'         => $this->sendSMS,
+            'sendEmail'       => $this->sendEmail,
+            'discountData'    => $this->discountData?->toArray(),
+            'taxData'         => $this->taxData?->toArray(),
+            'payLoad'         => $this->payLoad,
+            'dueDate'         => $this->dueDate,
+            'redirectionUrls' => $this->redirectionUrls?->toArray(),
+        ], fn($value) => $value !== null);
     }
 
     public static function builder(): CreateInvoiceBuilder

@@ -14,36 +14,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Vendor Key
-    |--------------------------------------------------------------------------
-    |
-    | Your Fawaterak vendor key. Some endpoints require this value to
-    | identify your merchant account.
-    |
-    */
-    'vendor_key' => env('FAWATERK_VENDOR_KEY', ''),
-
-    /*
-    |--------------------------------------------------------------------------
     | Mode
     |--------------------------------------------------------------------------
     |
     | Determines which API environment to use. Accepted values:
-    |   - "sandbox"    → uses sandbox_url (for testing)
+    |   - "staging"    → uses staging_url (for testing)
     |   - "production" → uses production_url (for live traffic)
     |
     */
-    'mode' => env('FAWATERK_MODE', 'sandbox'),
+    'mode' => env('FAWATERK_MODE', 'staging'),
 
     /*
     |--------------------------------------------------------------------------
-    | Sandbox URL
+    | Staging URL
     |--------------------------------------------------------------------------
     |
-    | The base URL used when mode is set to "sandbox".
+    | The base URL used when mode is set to "staging".
     |
     */
-    'sandbox_url' => env('FAWATERK_SANDBOX_URL', 'https://staging.fawaterk.com/api/v2'),
+    'staging_url' => env('FAWATERK_STAGING_URL', 'https://staging.fawaterk.com/api/v2'),
 
     /*
     |--------------------------------------------------------------------------

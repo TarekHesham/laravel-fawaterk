@@ -50,7 +50,7 @@ final class InitPayRequest
             'invoice_number' => $this->invoice_number,
             'customer' => $this->customer->toArray(),
             'redirectionUrls' => $this->redirectionUrls?->toArray(),
-            'cartItems' => array_map(fn(CartItemData $item) => $item->toArray(), $this->cartItems),
+            'cartItems' => array_map(fn($item) => $item->toArray(), $this->cartItems),
             'frequency' => $this->frequency?->value,
             'customExpireDate' => $this->customExpireDate,
             'discountData' => $this->discountData?->toArray(),

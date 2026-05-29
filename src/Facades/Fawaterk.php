@@ -14,7 +14,7 @@ use ElFarmawy\Fawaterk\Http\FawaterakClient;
  * Provides a static-style access point to the Fawaterk SDK coordinator.
  *
  * @method static FawaterakClient client()
- * @method static bool isSandbox()
+ * @method static bool isStaging()
  *
  * @see \ElFarmawy\Fawaterk\Fawaterk
  */

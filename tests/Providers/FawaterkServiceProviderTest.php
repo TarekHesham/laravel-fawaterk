@@ -6,7 +6,6 @@ use ElFarmawy\Fawaterk\Fawaterk;
 use ElFarmawy\Fawaterk\Facades\Fawaterk as FawaterkFacade;
 use ElFarmawy\Fawaterk\Http\FawaterakClient;
 use ElFarmawy\Fawaterk\Providers\FawaterkServiceProvider;
-use Orchestra\Testbench\TestCase;
 
 // Provide the package service provider to Testbench for every test in this file.
 beforeEach(function (): void {
@@ -14,9 +13,8 @@ beforeEach(function (): void {
 
     config()->set('fawaterk', [
         'api_key'        => 'test-api-key',
-        'vendor_key'     => 'test-vendor-key',
-        'mode'           => 'sandbox',
-        'sandbox_url'    => 'https://staging.fawaterk.com/api/v2',
+        'mode'           => 'staging',
+        'staging_url'    => 'https://staging.fawaterk.com/api/v2',
         'production_url' => 'https://app.fawaterk.com/api/v2',
         'timeout'        => 30,
         'retries'        => 0,
@@ -51,7 +49,7 @@ describe('FawaterkServiceProvider', function (): void {
 
     it('resolves config from the fawaterk key', function (): void {
         expect(config('fawaterk.api_key'))->toBe('test-api-key')
-            ->and(config('fawaterk.mode'))->toBe('sandbox');
+            ->and(config('fawaterk.mode'))->toBe('staging');
     });
 
     it('passes the config to FawaterakClient so it resolves the correct base URL', function (): void {
@@ -59,7 +57,7 @@ describe('FawaterkServiceProvider', function (): void {
         $client = $this->app->make(FawaterakClient::class);
 
         expect($client->getBaseUrl())->toBe('https://staging.fawaterk.com/api/v2')
-            ->and($client->isSandbox())->toBeTrue();
+            ->and($client->isStaging())->toBeTrue();
     });
 
     it('switches to production URL when mode is production', function (): void {
@@ -75,7 +73,7 @@ describe('FawaterkServiceProvider', function (): void {
         $client = $this->app->make(FawaterakClient::class);
 
         expect($client->getBaseUrl())->toBe('https://app.fawaterk.com/api/v2')
-            ->and($client->isSandbox())->toBeFalse();
+            ->and($client->isStaging())->toBeFalse();
     });
 });
 
@@ -89,9 +87,9 @@ describe('Fawaterk facade', function (): void {
         expect($instance)->toBeInstanceOf(Fawaterk::class);
     });
 
-    it('facade isSandbox() delegates to the underlying client', function (): void {
+    it('facade isStaging() delegates to the underlying client', function (): void {
         FawaterkFacade::setFacadeApplication($this->app);
 
-        expect(FawaterkFacade::isSandbox())->toBeTrue();
+        expect(FawaterkFacade::isStaging())->toBeTrue();
     });
 });

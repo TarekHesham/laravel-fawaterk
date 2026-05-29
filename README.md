@@ -123,14 +123,12 @@ Add your credentials to the `.env` file:
 ```env id="sdlf5g"
 FAWATERK_API_KEY=your_api_key_here
 
-FAWATERK_VENDOR_KEY=your_vendor_key_here
-
-FAWATERK_MODE=sandbox
+FAWATERK_MODE=staging
 ```
 
 Available modes:
 
-- `sandbox`
+- `staging`
 - `production`
 
 ---
@@ -144,7 +142,7 @@ use ElFarmawy\Fawaterk\Facades\Fawaterk;
 use ElFarmawy\Fawaterk\Enums\Currency;
 use ElFarmawy\Fawaterk\Data\Invoices\Requests\CreateInvoiceRequest;
 
-$response = Fawaterk::invoices()->createInvoiceLink(
+$response = Fawaterk::invoices()->create(
     CreateInvoiceRequest::builder()
         ->cartTotal(150)
         ->currency(Currency::EGP)
@@ -153,7 +151,7 @@ $response = Fawaterk::invoices()->createInvoiceLink(
         ->build()
 );
 
-return redirect($response->data->invoiceLink);
+return redirect($response->data->invoiceUrl);
 ```
 
 ---
@@ -174,8 +172,8 @@ $request = CreateInvoiceRequest::builder()
     ->currency(Currency::EGP)
     ->customer(
         new CustomerData(
-            first_name: 'John',
-            last_name: 'Doe',
+            firstName: 'John',
+            lastName: 'Doe',
             email: 'john@example.com',
             phone: '01000000000',
             address: '123 Main St'
@@ -197,11 +195,11 @@ $request = CreateInvoiceRequest::builder()
     ->build();
 
 $response = Fawaterk::invoices()
-    ->createInvoiceLink($request);
+    ->create($request);
 
 $invoiceId = $response->data->invoiceId;
 
-$paymentLink = $response->data->invoiceLink;
+$paymentLink = $response->data->invoiceUrl;
 ```
 
 ---
@@ -210,7 +208,7 @@ $paymentLink = $response->data->invoiceLink;
 
 ```php id="4rlhwp"
 $response = Fawaterk::invoices()
-    ->getInvoiceData($invoiceId);
+    ->find($invoiceId);
 ```
 
 ---
@@ -219,7 +217,7 @@ $response = Fawaterk::invoices()
 
 ```php id="4x17om"
 $verifiedInvoice = Fawaterk::invoices()
-    ->verifyPaidInvoice($invoiceId);
+    ->verifyPaid($invoiceId);
 ```
 
 This method throws a `RequestException` if the invoice is not paid or does not exist.
@@ -232,7 +230,7 @@ This method throws a `RequestException` if the invoice is not paid or does not e
 
 ```php id="f6f9e9"
 $methods = Fawaterk::gateway()
-    ->getPaymentMethods();
+    ->paymentMethods();
 
 foreach ($methods as $method) {
     echo $method->name_en;
@@ -244,6 +242,7 @@ foreach ($methods as $method) {
 ## Initialize Payment
 
 ```php id="dvw9my"
+use ElFarmawy\Fawaterk\Facades\Fawaterk;
 use ElFarmawy\Fawaterk\Data\Gateway\Requests\InitPayRequest;
 use ElFarmawy\Fawaterk\Enums\Currency;
 
@@ -251,12 +250,14 @@ $request = new InitPayRequest(
     payment_method_id: 2,
     cartTotal: 100,
     currency: Currency::EGP,
+    invoice_number: 'INV-' . time(),
     customer: $customerData,
-    cartItems: $cartItems
+    cartItems: $cartItems,
+    redirectionUrls: $redirectionUrlsData
 );
 
 $response = Fawaterk::gateway()
-    ->invoiceInitPay($request);
+    ->initPay($request);
 ```
 
 Depending on the selected payment method, the response will automatically resolve into one of the following DTOs:
@@ -275,7 +276,7 @@ Generate a secure hosted screen for saving customer cards.
 
 ```php id="jlwmf7"
 use ElFarmawy\Fawaterk\Data\Tokenization\Requests\CreateTokenScreenRequest;
-use ElFarmawy\Fawaterk\Data\Shared\RedirectionUrlsData;
+use ElFarmawy\Fawaterk\Data\Invoices\Shared\RedirectionUrlsData;
 
 $request = new CreateTokenScreenRequest(
     customer: $customerData,
@@ -343,6 +344,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use ElFarmawy\Fawaterk\Services\FawaterkWebhookService;
 use ElFarmawy\Fawaterk\Data\Webhooks\PaidWebhookData;
+use ElFarmawy\Fawaterk\Enums\WebhookType;
 use ElFarmawy\Fawaterk\Exceptions\WebhookSignatureVerificationException;
 
 class FawaterkWebhookController extends Controller
@@ -352,14 +354,13 @@ class FawaterkWebhookController extends Controller
         FawaterkWebhookService $webhookService
     ) {
         $payload = $request->all();
-
-        $webhookType = $request->query('type');
+        $webhookType = $request->query('type') ?? $request->input('type', 'paid');
 
         try {
 
-            $webhook = $webhookService->parse(
+            $webhook = $webhookService->verifyAndParse(
                 payload: $payload,
-                webhookType: $webhookType
+                webhookType: WebhookType::from($webhookType)
             );
 
             if ($webhook instanceof PaidWebhookData) {
@@ -407,7 +408,7 @@ use ElFarmawy\Fawaterk\Exceptions\AuthenticationException;
 try {
 
     $response = Fawaterk::invoices()
-        ->createInvoiceLink($request);
+        ->create($request);
 
 } catch (ValidationException $exception) {
 

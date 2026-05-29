@@ -17,7 +17,7 @@ use ElFarmawy\Fawaterk\Exceptions\ValidationException;
  *
  * Responsibilities:
  *  - Builds a pre-configured Laravel HTTP client instance
- *  - Resolves the correct base URL (sandbox vs production)
+ *  - Resolves the correct base URL (staging vs production)
  *  - Attaches Bearer authentication on every request
  *  - Applies timeout and retry configuration
  *  - Sends GET / POST requests with JSON encoding
@@ -71,16 +71,16 @@ class FawaterakClient
         return $this->parseResponse($response);
     }
 
-    /** The base URL currently in use (sandbox or production). */
+    /** The base URL currently in use (staging or production). */
     public function getBaseUrl(): string
     {
         return $this->baseUrl;
     }
 
-    /** Whether the client is operating in sandbox mode. */
-    public function isSandbox(): bool
+    /** Whether the client is operating in staging mode. */
+    public function isStaging(): bool
     {
-        return ($this->config['mode'] ?? 'sandbox') === 'sandbox';
+        return ($this->config['mode'] ?? 'staging') === 'staging';
     }
 
     /**
@@ -110,11 +110,11 @@ class FawaterakClient
      */
     private function resolveBaseUrl(): string
     {
-        $mode = (string) ($this->config['mode'] ?? 'sandbox');
+        $mode = (string) ($this->config['mode'] ?? 'staging');
 
         return $mode === 'production'
             ? rtrim((string) ($this->config['production_url'] ?? 'https://app.fawaterk.com/api/v2'), '/')
-            : rtrim((string) ($this->config['sandbox_url'] ?? 'https://staging.fawaterk.com/api/v2'), '/');
+            : rtrim((string) ($this->config['staging_url'] ?? 'https://staging.fawaterk.com/api/v2'), '/');
     }
 
     /**

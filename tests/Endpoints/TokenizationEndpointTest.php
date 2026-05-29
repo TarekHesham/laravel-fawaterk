@@ -15,7 +15,7 @@ use ElFarmawy\Fawaterk\Http\FawaterakClient;
 use Illuminate\Support\Facades\Http;
 
 beforeEach(function () {
-    $client = new FawaterakClient(['api_token' => 'test-token', 'vendor_key' => 'test-key', 'mode' => 'staging']);
+    $client = new FawaterakClient(['api_token' => 'test-token', 'mode' => 'staging']);
     $this->endpoint = new GatewayEndpoint($client);
 });
 

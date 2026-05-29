@@ -33,7 +33,7 @@ describe('CreateInvoiceRequest', function (): void {
         $array = $request->toArray();
 
         expect($array)->toBeArray()
-            ->and($array['cartTotal'])->toBe('100')
+            ->and($array['cartTotal'])->toBe(100.0)
             ->and($array['currency'])->toBe('EGP')
             ->and($array['customer']['first_name'])->toBe('John')
             ->and($array['cartItems'][0]['name'])->toBe('Item 1')
@@ -44,7 +44,7 @@ describe('CreateInvoiceRequest', function (): void {
             ->and($array['discountData']['type'])->toBe('pcg')
             ->and($array['taxData']['title'])->toBe('VAT')
             ->and($array['payLoad']['custom_key'])->toBe('custom_value')
-            ->and($array['due_date'])->toBe('2026-10-10')
+            ->and($array['dueDate'])->toBe('2026-10-10')
             ->and($array['redirectionUrls']['successUrl'])->toBe('https://example.com/callback');
     });
 

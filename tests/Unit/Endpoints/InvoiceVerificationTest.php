@@ -30,11 +30,11 @@ it('can verify a paid invoice from webhook', function () {
     $mockApiResponse = ApiResponse::fromArray($responseBody, 200);
     $mockInvoiceResponse = InvoiceResponse::fromApiResponse($mockApiResponse);
 
-    $this->invoiceEndpoint->shouldReceive('getInvoiceData')
+    $this->invoiceEndpoint->shouldReceive('find')
         ->with($invoiceId)
         ->andReturn($mockInvoiceResponse);
 
-    $invoiceResponse = $this->invoiceEndpoint->verifyPaidInvoice($invoiceId);
+    $invoiceResponse = $this->invoiceEndpoint->verifyPaid($invoiceId);
 
     expect($invoiceResponse)->toBeInstanceOf(InvoiceResponse::class)
         ->and($invoiceResponse->data)->not->toBeNull()
@@ -49,11 +49,11 @@ it('throws RequestException if invoice is not found', function () {
     $mockApiResponse = ApiResponse::fromArray($responseBody, 200);
     $mockInvoiceResponse = InvoiceResponse::fromApiResponse($mockApiResponse);
 
-    $this->invoiceEndpoint->shouldReceive('getInvoiceData')
+    $this->invoiceEndpoint->shouldReceive('find')
         ->with($invoiceId)
         ->andReturn($mockInvoiceResponse);
 
-    $this->invoiceEndpoint->verifyPaidInvoice($invoiceId);
+    $this->invoiceEndpoint->verifyPaid($invoiceId);
 })->throws(RequestException::class, "Invoice with ID 456 not found or no data returned.");
 
 it('throws RequestException if invoice status is not paid', function () {
@@ -71,19 +71,19 @@ it('throws RequestException if invoice status is not paid', function () {
     $mockApiResponse = ApiResponse::fromArray($responseBody, 200);
     $mockInvoiceResponse = InvoiceResponse::fromApiResponse($mockApiResponse);
 
-    $this->invoiceEndpoint->shouldReceive('getInvoiceData')
+    $this->invoiceEndpoint->shouldReceive('find')
         ->with($invoiceId)
         ->andReturn($mockInvoiceResponse);
 
-    $this->invoiceEndpoint->verifyPaidInvoice($invoiceId);
+    $this->invoiceEndpoint->verifyPaid($invoiceId);
 })->throws(RequestException::class, "Invoice with ID 789 has a status of 'pending', expected 'paid'.");
 
-it('propels ApiException when getInvoiceData fails', function () {
+it('propels ApiException when find fails', function () {
     $invoiceId = 101;
 
-    $this->invoiceEndpoint->shouldReceive('getInvoiceData')
+    $this->invoiceEndpoint->shouldReceive('find')
         ->with($invoiceId)
         ->andThrow(new ApiException('API Error', 400, []));
 
-    $this->invoiceEndpoint->verifyPaidInvoice($invoiceId);
+    $this->invoiceEndpoint->verifyPaid($invoiceId);
 })->throws(ApiException::class, "API Error");

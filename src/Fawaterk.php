@@ -33,11 +33,11 @@ class Fawaterk
     }
 
     /**
-     * Whether the SDK is operating in sandbox mode.
+     * Whether the SDK is operating in staging mode.
      */
-    public function isSandbox(): bool
+    public function isStaging(): bool
     {
-        return $this->client->isSandbox();
+        return $this->client->isStaging();
     }
 
     public function invoices(): \ElFarmawy\Fawaterk\Endpoints\InvoiceEndpoint

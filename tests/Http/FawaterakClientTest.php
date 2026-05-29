@@ -18,9 +18,8 @@ function makeClient(array $overrides = []): FawaterakClient
 {
     $config = array_merge([
         'api_key'        => 'test-api-key',
-        'vendor_key'     => 'test-vendor-key',
-        'mode'           => 'sandbox',
-        'sandbox_url'    => 'https://staging.fawaterk.com/api/v2',
+        'mode'           => 'staging',
+        'staging_url'    => 'https://staging.fawaterk.com/api/v2',
         'production_url' => 'https://app.fawaterk.com/api/v2',
         'timeout'        => 30,
         'retries'        => 0,
@@ -36,22 +35,22 @@ function makeClient(array $overrides = []): FawaterakClient
 
 describe('FawaterakClient – base URL', function (): void {
 
-    it('uses the sandbox URL in sandbox mode', function (): void {
-        $client = makeClient(['mode' => 'sandbox', 'sandbox_url' => 'https://staging.fawaterk.com/api/v2']);
+    it('uses the staging URL in staging mode', function (): void {
+        $client = makeClient(['mode' => 'staging', 'staging_url' => 'https://staging.fawaterk.com/api/v2']);
 
         expect($client->getBaseUrl())->toBe('https://staging.fawaterk.com/api/v2')
-            ->and($client->isSandbox())->toBeTrue();
+            ->and($client->isStaging())->toBeTrue();
     });
 
     it('uses the production URL in production mode', function (): void {
         $client = makeClient(['mode' => 'production', 'production_url' => 'https://app.fawaterk.com/api/v2']);
 
         expect($client->getBaseUrl())->toBe('https://app.fawaterk.com/api/v2')
-            ->and($client->isSandbox())->toBeFalse();
+            ->and($client->isStaging())->toBeFalse();
     });
 
     it('strips trailing slashes from base URL', function (): void {
-        $client = makeClient(['mode' => 'sandbox', 'sandbox_url' => 'https://staging.fawaterk.com/api/v2/']);
+        $client = makeClient(['mode' => 'staging', 'staging_url' => 'https://staging.fawaterk.com/api/v2/']);
 
         expect($client->getBaseUrl())->toBe('https://staging.fawaterk.com/api/v2');
     });

@@ -19,10 +19,10 @@ final class RedirectionUrlsData
     public static function fromArray(array $data): self
     {
         return new self(
-            successUrl: $data['successUrl'] ?? null,
-            failUrl: $data['failUrl'] ?? null,
-            pendingUrl: $data['pendingUrl'] ?? null,
-            webhookUrl: $data['webhookUrl'] ?? null,
+            $data['successUrl'] ?? null,
+            $data['failUrl'] ?? null,
+            $data['pendingUrl'] ?? null,
+            $data['webhookUrl'] ?? null,
         );
     }
 
@@ -31,20 +31,11 @@ final class RedirectionUrlsData
      */
     public function toArray(): array
     {
-        $data = [];
-        if ($this->successUrl !== null) {
-            $data['successUrl'] = $this->successUrl;
-        }
-        if ($this->failUrl !== null) {
-            $data['failUrl'] = $this->failUrl;
-        }
-        if ($this->pendingUrl !== null) {
-            $data['pendingUrl'] = $this->pendingUrl;
-        }
-        if ($this->webhookUrl !== null) {
-            $data['webhookUrl'] = $this->webhookUrl;
-        }
-
-        return $data;
+        return array_filter([
+            'successUrl' => $this->successUrl,
+            'failUrl'    => $this->failUrl,
+            'pendingUrl' => $this->pendingUrl,
+            'webhookUrl' => $this->webhookUrl,
+        ], fn($value) => $value !== null);
     }
 }

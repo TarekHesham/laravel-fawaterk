@@ -19,8 +19,8 @@ function makeGatewayEndpoint(): GatewayEndpoint
 {
     $config = [
         'api_key'        => 'api-key', // Updated API key
-        'mode'           => 'sandbox',
-        'sandbox_url'    => 'https://staging.fawaterk.com/api/v2',
+        'mode'           => 'staging',
+        'staging_url'    => 'https://staging.fawaterk.com/api/v2',
         'timeout'        => 30,
         'retries'        => 0,
     ];
@@ -58,7 +58,7 @@ describe('GatewayEndpoint', function (): void {
 
         $endpoint = makeGatewayEndpoint();
 
-        $paymentMethods = $endpoint->getPaymentMethods();
+        $paymentMethods = $endpoint->paymentMethods();
 
         expect($paymentMethods)->toBeArray()
             ->and(count($paymentMethods))->toBe(2)
@@ -89,7 +89,7 @@ describe('GatewayEndpoint', function (): void {
 
         $endpoint = makeGatewayEndpoint();
 
-        $paymentMethods = $endpoint->getPaymentMethods();
+        $paymentMethods = $endpoint->paymentMethods();
 
         expect($paymentMethods)->toBeArray()->toBeEmpty();
 
@@ -107,7 +107,7 @@ describe('GatewayEndpoint', function (): void {
         $endpoint = makeGatewayEndpoint();
 
         // Expect an AuthenticationException to be thrown because of the 401 status
-        expect(fn() => $endpoint->getPaymentMethods())->toThrow(\ElFarmawy\Fawaterk\Exceptions\AuthenticationException::class);
+        expect(fn() => $endpoint->paymentMethods())->toThrow(\ElFarmawy\Fawaterk\Exceptions\AuthenticationException::class);
 
         Http::assertSent(function ($request) {
             return $request->url() === 'https://staging.fawaterk.com/api/v2/getPaymentmethods' &&
@@ -147,7 +147,7 @@ describe('GatewayEndpoint', function (): void {
             ),
         );
 
-        $response = $endpoint->invoiceInitPay($request);
+        $response = $endpoint->initPay($request);
 
         expect($response)->toBeInstanceOf(InitPayRedirectResponse::class)
             ->and($response->invoiceId)->toBe(1000428)
@@ -188,7 +188,7 @@ describe('GatewayEndpoint', function (): void {
             ],
         );
 
-        $response = $endpoint->invoiceInitPay($request);
+        $response = $endpoint->initPay($request);
 
         expect($response)->toBeInstanceOf(InitPayFawryResponse::class)
             ->and($response->invoiceId)->toBe(1000425)
@@ -231,7 +231,7 @@ describe('GatewayEndpoint', function (): void {
             mobileWalletNumber: '01000000000', // Required for Mobile Wallet
         );
 
-        $response = $endpoint->invoiceInitPay($request);
+        $response = $endpoint->initPay($request);
 
         expect($response)->toBeInstanceOf(InitPayMeezaResponse::class)
             ->and($response->invoiceId)->toBe(1000427)

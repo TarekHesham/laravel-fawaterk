@@ -16,8 +16,8 @@ function makeInvoiceEndpoint(): InvoiceEndpoint
 {
     $config = [
         'api_key'        => 'test-key',
-        'mode'           => 'sandbox',
-        'sandbox_url'    => 'https://staging.fawaterk.com/api/v2',
+        'mode'           => 'staging',
+        'staging_url'    => 'https://staging.fawaterk.com/api/v2',
         'timeout'        => 30,
         'retries'        => 0,
     ];
@@ -58,7 +58,7 @@ describe('InvoiceEndpoint', function (): void {
             redirectionUrls: new \ElFarmawy\Fawaterk\Data\Invoices\Shared\RedirectionUrlsData(successUrl: 'https://example.com/callback')
         );
 
-        $response = $endpoint->createInvoiceLink($request);
+        $response = $endpoint->create($request);
 
         expect($response)->toBeInstanceOf(InvoiceResponse::class)
             ->and($response->successful)->toBeTrue()
@@ -70,7 +70,7 @@ describe('InvoiceEndpoint', function (): void {
         Http::assertSent(function ($request) {
             return $request->url() === 'https://staging.fawaterk.com/api/v2/createInvoiceLink' &&
                 $request->method() === 'POST' &&
-                $request['cartTotal'] === '100' &&
+                $request['cartTotal'] === 100.0 &&
                 $request['currency'] === 'EGP' &&
                 $request['customer']['first_name'] === 'John' &&
                 $request['cartItems'][0]['name'] === 'Item 1' &&
@@ -95,7 +95,7 @@ describe('InvoiceEndpoint', function (): void {
 
         $endpoint = makeInvoiceEndpoint();
 
-        $response = $endpoint->getInvoiceData(123);
+        $response = $endpoint->find(123);
 
         expect($response)->toBeInstanceOf(InvoiceResponse::class)
             ->and($response->successful)->toBeTrue()

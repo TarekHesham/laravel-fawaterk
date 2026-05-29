@@ -11,9 +11,8 @@
     </testsuites>
     <php>
         <env name="APP_ENV" value="testing"/>
-        <env name="FAWATERK_API_KEY" value="test-api-key"/>
-        <env name="FAWATERK_VENDOR_KEY" value="test-vendor-key"/>
-        <env name="FAWATERK_MODE" value="sandbox"/>
+        <env name="FAWATERK_API_KEY" value="api_key"/>
+        <env name="FAWATERK_MODE" value="staging"/>
     </php>
     <source>
         <include>

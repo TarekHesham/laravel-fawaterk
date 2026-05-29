@@ -27,13 +27,13 @@ class IntegrationTest extends TestCase
 
         config([
             'fawaterk.api_key' => $apiKey,
-            'fawaterk.mode' => 'sandbox',
+            'fawaterk.mode' => 'staging',
         ]);
 
         $config = [
             'api_key' => $apiKey,
-            'mode' => 'sandbox',
-            'sandbox_url' => 'https://staging.fawaterk.com/api/v2',
+            'mode' => 'staging',
+            'staging_url' => 'https://staging.fawaterk.com/api/v2',
         ];
 
         $client = new FawaterakClient($config);
@@ -41,15 +41,15 @@ class IntegrationTest extends TestCase
         $this->fawaterk = new Fawaterk($client);
     }
 
-    public function testGetPaymentMethods()
+    public function testpaymentMethods()
     {
         $endpoint = new \ElFarmawy\Fawaterk\Endpoints\GatewayEndpoint($this->fawaterk->client());
-        $methods = $endpoint->getPaymentMethods();
+        $methods = $endpoint->paymentMethods();
         $this->assertIsArray($methods);
         $this->assertGreaterThan(0, count($methods));
     }
 
-    public function testCreateInvoiceLink()
+    public function testcreate()
     {
         $endpoint = new \ElFarmawy\Fawaterk\Endpoints\InvoiceEndpoint($this->fawaterk->client());
 
@@ -76,14 +76,14 @@ class IntegrationTest extends TestCase
             cartItems: $cartItems
         );
 
-        $response = $endpoint->createInvoiceLink($request);
+        $response = $endpoint->create($request);
 
         $this->assertNotNull($response->data->invoiceUrl);
         $this->assertNotNull($response->data->invoiceKey);
         $this->assertGreaterThan(0, $response->data->invoiceId);
     }
 
-    public function testGetInvoiceData()
+    public function testfind()
     {
         $endpoint = new \ElFarmawy\Fawaterk\Endpoints\InvoiceEndpoint($this->fawaterk->client());
 
@@ -110,9 +110,9 @@ class IntegrationTest extends TestCase
             cartItems: $cartItems
         );
 
-        $created = $endpoint->createInvoiceLink($request);
+        $created = $endpoint->create($request);
 
-        $retrieved = $endpoint->getInvoiceData($created->data->invoiceId);
+        $retrieved = $endpoint->find($created->data->invoiceId);
 
         $this->assertEquals($created->data->invoiceId, $retrieved->data->invoiceId);
     }
@@ -123,7 +123,7 @@ class IntegrationTest extends TestCase
 
         $invoiceId = 1099266;
 
-        $response = $endpoint->verifyPaidInvoice($invoiceId);
+        $response = $endpoint->verifyPaid($invoiceId);
 
         $this->assertTrue($response->data->invoiceStatus === 'paid' || $response->data->paid === true);
     }

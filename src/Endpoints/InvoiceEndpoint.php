@@ -15,7 +15,7 @@ class InvoiceEndpoint extends BaseEndpoint
     /**
      * Create a new invoice link.
      */
-    public function createInvoiceLink(CreateInvoiceRequest $request): InvoiceResponse
+    public function create(CreateInvoiceRequest $request): InvoiceResponse
     {
         $response = $this->client->post('/createInvoiceLink', $request->toArray());
 
@@ -25,16 +25,16 @@ class InvoiceEndpoint extends BaseEndpoint
     /**
      * Get details for a specific invoice.
      */
-    public function getInvoiceData(int $invoiceId): InvoiceResponse
+    public function find(int $invoiceId): InvoiceResponse
     {
         $response = $this->client->get("/getInvoiceData/{$invoiceId}");
 
         return InvoiceResponse::fromApiResponse($response);
     }
 
-    public function verifyPaidInvoice(int $invoiceId): InvoiceResponse
+    public function verifyPaid(int $invoiceId): InvoiceResponse
     {
-        $invoiceResponse = $this->getInvoiceData($invoiceId);
+        $invoiceResponse = $this->find($invoiceId);
 
         if (! $invoiceResponse->data) {
             throw new RequestException("Invoice with ID {$invoiceId} not found or no data returned.");

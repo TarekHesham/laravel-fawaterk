@@ -8,19 +8,20 @@ use ElFarmawy\Fawaterk\Data\Webhooks\CanceledWebhookData;
 use ElFarmawy\Fawaterk\Data\Webhooks\FailedWebhookData;
 use ElFarmawy\Fawaterk\Data\Webhooks\PaidWebhookData;
 use ElFarmawy\Fawaterk\Data\Webhooks\RefundWebhookData;
+use ElFarmawy\Fawaterk\Enums\WebhookType;
 use ElFarmawy\Fawaterk\Exceptions\WebhookSignatureVerificationException;
 use Illuminate\Support\Facades\Log;
 
 class FawaterkWebhookService
 {
-    protected string $vendorKey;
+    protected string $apiKey;
 
     public function __construct()
     {
-        $this->vendorKey = config('fawaterk.vendor_key');
+        $this->apiKey = config('fawaterk.api_key');
     }
 
-    public function verifySignature(array $payload, string $webhookType): bool
+    public function verifySignature(array $payload, WebhookType $webhookType): bool
     {
         $hashKey = $payload['hashKey'] ?? null;
         if (! $hashKey) {
@@ -32,22 +33,22 @@ class FawaterkWebhookService
         return hash_equals($expectedHash, $hashKey);
     }
 
-    public function parse(array $payload, string $webhookType): PaidWebhookData|CanceledWebhookData|FailedWebhookData|RefundWebhookData
+    public function verifyAndParse(array $payload, WebhookType $webhookType): PaidWebhookData|CanceledWebhookData|FailedWebhookData|RefundWebhookData
     {
         if (! $this->verifySignature($payload, $webhookType)) {
             throw new WebhookSignatureVerificationException('Invalid webhook signature.');
         }
 
         return match ($webhookType) {
-            'paid'     => PaidWebhookData::fromArray($payload),
-            'canceled' => CanceledWebhookData::fromArray($payload),
-            'failed'   => FailedWebhookData::fromArray($payload),
-            'refund'   => RefundWebhookData::fromArray($payload),
-            default    => throw new \InvalidArgumentException('Unknown webhook type.'),
+            WebhookType::PAID     => PaidWebhookData::fromArray($payload),
+            WebhookType::CANCELED => CanceledWebhookData::fromArray($payload),
+            WebhookType::FAILED   => FailedWebhookData::fromArray($payload),
+            WebhookType::REFUND   => RefundWebhookData::fromArray($payload),
+            default => throw new \InvalidArgumentException('Unknown webhook type.'),
         };
     }
 
-    public function safeVerifySignature(array $payload, string $webhookType): bool
+    public function safeVerifySignature(array $payload, WebhookType $webhookType): bool
     {
         try {
             return $this->verifySignature($payload, $webhookType);
@@ -58,12 +59,13 @@ class FawaterkWebhookService
         }
     }
 
-    protected function generateExpectedHash(array $payload, string $webhookType): string
+    protected function generateExpectedHash(array $payload, WebhookType $webhookType): string
     {
         $queryParam = '';
+
         switch ($webhookType) {
-            case 'paid':
-            case 'failed':
+            case WebhookType::PAID:
+            case WebhookType::FAILED:
                 // Documentation example: InvoiceId=response.invoice_id&InvoiceKey=response.invoice_key&PaymentMethod=response.payment_method
                 $queryParam = sprintf(
                     'InvoiceId=%s&InvoiceKey=%s&PaymentMethod=%s',
@@ -72,7 +74,7 @@ class FawaterkWebhookService
                     $payload['payment_method'] ?? ''
                 );
                 break;
-            case 'canceled':
+            case WebhookType::CANCELED:
                 // Documentation example: referenceId=response.referenceId&PaymentMethod=response.paymentMethod
                 $queryParam = sprintf(
                     'referenceId=%s&PaymentMethod=%s',
@@ -80,13 +82,13 @@ class FawaterkWebhookService
                     $payload['paymentMethod'] ?? ''
                 );
                 break;
-            case 'refund':
+            case WebhookType::REFUND:
                 // Hash key generation is not documented for refund webhooks.
                 return '';
             default:
-                throw new \InvalidArgumentException('Unknown webhook type for hash generation: ' . $webhookType);
+                throw new \InvalidArgumentException('Unknown webhook type for hash generation: ' . $webhookType->value);
         }
 
-        return hash_hmac('sha256', $queryParam, $this->vendorKey, false);
+        return hash_hmac('sha256', $queryParam, $this->apiKey, false);
     }
 }
