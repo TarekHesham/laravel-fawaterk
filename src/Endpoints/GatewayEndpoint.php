@@ -77,34 +77,47 @@ class GatewayEndpoint extends BaseEndpoint
 
     /**
      * Resolve the InitPay response into the correct DTO.
+     * 
+     * SECURITY FIX: Validates payment_data is an array before accessing array keys.
+     *
+     * @throws ApiException If response type cannot be determined or is invalid
      */
     private function resolveInitPayResponse(ApiResponse $response): InitPayRedirectResponse|InitPayFawryResponse|InitPayMeezaResponse|InitPayAmanResponse|InitPayBastaResponse
     {
         $paymentData = $response->get('payment_data');
 
-        if (isset($paymentData['redirectTo'])) {
+        // SECURITY FIX: Validate paymentData is an array before using array operations
+        if (!is_array($paymentData)) {
+            throw new ApiException(
+                message: 'Invalid payment_data: expected array, got ' . gettype($paymentData),
+                context: ['payment_data_type' => gettype($paymentData)],
+            );
+        }
+
+        // Use strict type checking instead of isset
+        if (!empty($paymentData['redirectTo']) && is_string($paymentData['redirectTo'])) {
             return InitPayRedirectResponse::fromApiResponse($response);
         }
 
-        if (isset($paymentData['fawryCode'])) {
+        if (!empty($paymentData['fawryCode']) && is_string($paymentData['fawryCode'])) {
             return InitPayFawryResponse::fromApiResponse($response);
         }
 
-        if (isset($paymentData['meezaQrCode'])) {
+        if (!empty($paymentData['meezaQrCode']) && is_string($paymentData['meezaQrCode'])) {
             return InitPayMeezaResponse::fromApiResponse($response);
         }
 
-        if (isset($paymentData['amanCode'])) {
+        if (!empty($paymentData['amanCode']) && is_string($paymentData['amanCode'])) {
             return InitPayAmanResponse::fromApiResponse($response);
         }
 
-        if (isset($paymentData['masaryCode'])) {
+        if (!empty($paymentData['masaryCode']) && is_string($paymentData['masaryCode'])) {
             return InitPayBastaResponse::fromApiResponse($response);
         }
 
         throw new ApiException(
-            message: 'Unknown InitPay response type',
-            context: $response->raw(),
+            message: 'Unknown InitPay response type - no recognized payment method indicator found',
+            context: ['available_keys' => array_keys($paymentData)],
         );
     }
 }

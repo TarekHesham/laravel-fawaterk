@@ -71,7 +71,22 @@ return [
     |--------------------------------------------------------------------------
     |
     | Milliseconds to wait between retry attempts.
+    | Uses exponential backoff: delay * 2^(attempt-1) + random jitter
     |
     */
     'retry_delay' => (int) env('FAWATERK_RETRY_DELAY', 500),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Rate Limiting
+    |--------------------------------------------------------------------------
+    |
+    | Enable client-side rate limiting to prevent API abuse.
+    | Recommended for production use with high-frequency API calls.
+    |
+    */
+    'rate_limiter' => [
+        'enabled' => (bool) env('FAWATERK_RATE_LIMIT_ENABLED', false),
+        'requests_per_minute' => (int) env('FAWATERK_RATE_LIMIT_RPM', 60),
+    ],
 ];
