@@ -18,6 +18,7 @@ final class InitPayRequest
 {
     /**
      * @param  CartItemData[] $cartItems
+     * @throws InvalidArgumentException If validation fails
      */
     public function __construct(
         public readonly int $payment_method_id,
@@ -39,7 +40,57 @@ final class InitPayRequest
         public readonly ?bool $sendSMS = null,
         public readonly ?Language $lang = null,
         public readonly ?bool $redirectOption = null, // default false
-    ) {}
+    ) {
+        $this->validate();
+    }
+
+    /**
+     * Validate all payment request parameters.
+     * 
+     * SECURITY FIX: Prevents invalid amounts, payment methods, and malformed data.
+     *
+     * @throws InvalidArgumentException
+     */
+    private function validate(): void
+    {
+        // Validate payment method ID
+        if ($this->payment_method_id <= 0) {
+            throw new InvalidArgumentException(
+                'payment_method_id must be a positive integer, got: ' . $this->payment_method_id
+            );
+        }
+
+        // Validate cart total
+        if ($this->cartTotal <= 0) {
+            throw new InvalidArgumentException(
+                'cartTotal must be greater than 0, got: ' . $this->cartTotal
+            );
+        }
+
+        // Prevent extremely large amounts (security limit: 1 million)
+        if ($this->cartTotal > 1000000) {
+            throw new InvalidArgumentException(
+                'cartTotal exceeds maximum allowed amount (1,000,000). Got: ' . $this->cartTotal
+            );
+        }
+
+        // Validate cart items
+        if (empty($this->cartItems)) {
+            throw new InvalidArgumentException('At least one cart item is required.');
+        }
+
+        // Validate authAndCapture if provided
+        if ($this->authAndCapture !== null && !in_array($this->authAndCapture, [0, 1], true)) {
+            throw new InvalidArgumentException(
+                'authAndCapture must be 0 or 1, got: ' . $this->authAndCapture
+            );
+        }
+
+        // Validate mobile wallet number if provided
+        if ($this->mobileWalletNumber !== null && trim($this->mobileWalletNumber) === '') {
+            throw new InvalidArgumentException('mobileWalletNumber cannot be empty if provided.');
+        }
+    }
 
     public function toArray(): array
     {

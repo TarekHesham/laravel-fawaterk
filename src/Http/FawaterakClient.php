@@ -85,6 +85,8 @@ class FawaterakClient
 
     /**
      * Build a fully-configured PendingRequest ready for sending.
+     * 
+     * Includes exponential backoff with jitter for retries to prevent thundering herd.
      */
     private function buildRequest(): PendingRequest
     {
@@ -99,7 +101,12 @@ class FawaterakClient
             ->timeout($timeout);
 
         if ($retries > 0) {
-            $request = $request->retry($retries, $retryDelay, throw: false);
+            // Use exponential backoff with jitter to avoid thundering herd
+            $request = $request->retry(
+                $retries,
+                fn($attempt) => $retryDelay * (2 ** ($attempt - 1)) + random_int(0, 100),
+                throw: false
+            );
         }
 
         return $request;
@@ -107,14 +114,44 @@ class FawaterakClient
 
     /**
      * Resolve the appropriate base URL based on the configured mode.
+     * 
+     * SECURITY: Validates URL format, enforces HTTPS in production, and whitelists hostnames.
+     * 
+     * @throws InvalidArgumentException If URL is invalid or not whitelisted
      */
     private function resolveBaseUrl(): string
     {
         $mode = (string) ($this->config['mode'] ?? 'staging');
 
-        return $mode === 'production'
+        $url = $mode === 'production'
             ? rtrim((string) ($this->config['production_url'] ?? 'https://app.fawaterk.com/api/v2'), '/')
             : rtrim((string) ($this->config['staging_url'] ?? 'https://staging.fawaterk.com/api/v2'), '/');
+
+        // Validate URL format
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            throw new \InvalidArgumentException(
+                "Invalid Fawaterk API URL: {$url}. Please check your FAWATERK_STAGING_URL or FAWATERK_PRODUCTION_URL configuration."
+            );
+        }
+
+        // Enforce HTTPS in production mode
+        if ($mode === 'production' && !str_starts_with($url, 'https://')) {
+            throw new \InvalidArgumentException(
+                'Production API URL must use HTTPS protocol for security. Current URL: ' . $url
+            );
+        }
+
+        // Validate hostname against whitelist to prevent SSRF attacks
+        $host = parse_url($url, PHP_URL_HOST);
+        $allowedHosts = ['app.fawaterk.com', 'staging.fawaterk.com'];
+        
+        if (!in_array($host, $allowedHosts, true)) {
+            throw new \InvalidArgumentException(
+                "Invalid API hostname: {$host}. Only official Fawaterk URLs are allowed: " . implode(', ', $allowedHosts)
+            );
+        }
+
+        return $url;
     }
 
     /**
@@ -127,6 +164,8 @@ class FawaterakClient
 
     /**
      * Parse the raw HTTP response into an ApiResponse or throw a typed exception.
+     * 
+     * SECURITY: Sanitizes error messages and context to avoid exposing sensitive data.
      *
      * @throws AuthenticationException  On HTTP 401.
      * @throws ValidationException      On HTTP 422.
@@ -144,30 +183,38 @@ class FawaterakClient
 
         // Normalise HTTP errors into typed exceptions.
         if ($response->failed()) {
-            $apiMessage = $body['message'] ?? null;
+            // Use safe error messages instead of raw API messages
+            $safeMessage = match ($status) {
+                400 => 'Invalid request parameters',
+                401 => 'Authentication failed',
+                403 => 'Access denied',
+                404 => 'Resource not found',
+                422 => 'Validation failed',
+                429 => 'Rate limit exceeded',
+                500 => 'Internal server error',
+                default => 'API request failed',
+            };
 
-            if (is_array($apiMessage)) {
-                $message = json_encode($apiMessage, JSON_UNESCAPED_UNICODE);
-            } else {
-                $message = (string) ($apiMessage ?? $response->reason() ?? 'Unknown error');
-            }
+            // Preserve original message for debugging but don't expose it to end users
+            $sanitizedContext = $this->sanitizeContext($body);
+            $sanitizedContext['original_status_reason'] = $response->reason();
 
             match (true) {
                 $status === 401 => throw new AuthenticationException(
-                    message: $message,
+                    message: $safeMessage,
                     code: $status,
-                    context: $body,
+                    context: $sanitizedContext,
                 ),
                 $status === 422 => throw new ValidationException(
                     errors: (array) ($body['errors'] ?? []),
-                    message: $message,
+                    message: $safeMessage,
                     code: $status,
-                    context: $body,
+                    context: $sanitizedContext,
                 ),
                 default => throw new RequestException(
-                    message: $message,
+                    message: $safeMessage,
                     code: $status,
-                    context: $body,
+                    context: $sanitizedContext,
                 ),
             };
         }
@@ -194,4 +241,26 @@ class FawaterakClient
             return [];
         }
     }
-}
+    /**
+     * Sanitize response context to remove sensitive fields before logging/storing.
+     * 
+     * SECURITY: Prevents exposure of payment tokens, customer PII, and sensitive data.
+     *
+     * @param  array<string, mixed> $context
+     * @return array<string, mixed>
+     */
+    private function sanitizeContext(array $context): array
+    {
+        $sensitiveKeys = [
+            'payment_token', 'token', 'card_number', 'cvv', 'card_cvv',
+            'customer', 'email', 'phone', 'address', 'first_name', 'last_name',
+            'payment_data', 'invoice_data', 'customer_id', 'hashkey', 'hash_key',
+            'api_key', 'secret', 'password', 'authorization',
+        ];
+
+        return array_filter(
+            $context,
+            fn($key) => !in_array(strtolower($key), $sensitiveKeys, true),
+            ARRAY_FILTER_USE_KEY
+        );
+    }}

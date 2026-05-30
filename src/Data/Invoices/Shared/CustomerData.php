@@ -27,17 +27,30 @@ final class CustomerData
         $pattern = '/^[a-zA-Z0-9@\-_.]+$/';
 
         if (trim($this->firstName) === '') {
-            throw new \InvalidArgumentException('Customer first name cannot be empty.');
+            throw new InvalidArgumentException('Customer first name cannot be empty.');
         }
         if (!preg_match($pattern, $this->firstName)) {
-            \Illuminate\Support\Facades\Log::warning('Customer first name contains characters outside of expected range.', ['firstName' => $this->firstName]);
+            // SECURITY FIX: Log field metadata instead of PII
+            \Illuminate\Support\Facades\Log::warning(
+                'Customer first name contains characters outside of expected range (length: ' . 
+                strlen($this->firstName) . ' characters)'
+            );
         }
 
         if (trim($this->lastName) === '') {
-            throw new \InvalidArgumentException('Customer last name cannot be empty.');
+            throw new InvalidArgumentException('Customer last name cannot be empty.');
         }
         if (!preg_match($pattern, $this->lastName)) {
-            \Illuminate\Support\Facades\Log::warning('Customer last name contains characters outside of expected range.', ['lastName' => $this->lastName]);
+            // SECURITY FIX: Log field metadata instead of PII
+            \Illuminate\Support\Facades\Log::warning(
+                'Customer last name contains characters outside of expected range (length: ' . 
+                strlen($this->lastName) . ' characters)'
+            );
+        }
+
+        // SECURITY FIX: Validate email format
+        if ($this->email !== null && !filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+            throw new InvalidArgumentException('Invalid email address format provided.');
         }
     }
 

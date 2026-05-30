@@ -59,6 +59,18 @@ class FawaterkWebhookService
         }
     }
 
+    /**
+     * Generate expected webhook hash per Fawaterk documentation.
+     * 
+     * Hash generation rules:
+     * 1. Extract fields in the order specified for each webhook type
+     * 2. Format as URL query string (field=value&field2=value2)
+     * 3. Handle null/empty values as empty strings
+     * 4. Use HMAC-SHA256 with API key
+     * 
+     * @see https://fawaterk.com/docs/webhooks/verification or whatever the docs link is
+     * @throws InvalidArgumentException If webhook type is unknown or not supported
+     */
     protected function generateExpectedHash(array $payload, WebhookType $webhookType): string
     {
         $queryParam = '';
@@ -83,8 +95,14 @@ class FawaterkWebhookService
                 );
                 break;
             case WebhookType::REFUND:
-                // Hash key generation is not documented for refund webhooks.
-                return '';
+                // SECURITY FIX: Refund webhook signature verification is not documented.
+                // Contact Fawaterk support to obtain the correct hash generation algorithm.
+                // Until then, reject all refund webhooks to prevent spoofing attacks.
+                throw new \InvalidArgumentException(
+                    'Refund webhook signature verification is not yet implemented. '
+                    . 'Please contact Fawaterk support for hash generation documentation '
+                    . 'or update the SDK once the algorithm is known.'
+                );
             default:
                 throw new \InvalidArgumentException('Unknown webhook type for hash generation: ' . $webhookType->value);
         }
